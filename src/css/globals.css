@@ -1,0 +1,18 @@
+body {
+    background-color: #f3f5fb !important;
+}
+
+a {
+    transition: 0.1s;
+}
+
+a:hover {
+    opacity: 0.8;
+    transition: 0.1s;
+    text-decoration: underline;
+}
+
+.znc .main {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+        Meiryo, sans-serif, "Segoe UI Emoji";
+}
