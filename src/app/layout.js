@@ -15,6 +15,11 @@ export const metadata = {
     title: "KeNJi CodeLab",
     description:
         "KeNJi CodeLabは、プログラミングを楽しく学べる場所。創造力を刺激する学習記事やチュートリアルも充実した学内コミュニティです。",
+    icons: {
+        icon: "/icon.svg",
+        shortcut: "/favicon.ico",
+        apple: "/apple-touch-icon.png",
+    },
 };
 
 export default function RootLayout({ children }) {
@@ -24,6 +29,7 @@ export default function RootLayout({ children }) {
                 <StyledComponentsRegistry>
                     <Header />
                     {children}
+
                     <Footer />
                 </StyledComponentsRegistry>
             </body>

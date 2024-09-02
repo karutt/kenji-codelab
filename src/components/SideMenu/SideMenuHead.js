@@ -3,7 +3,13 @@ import Link from "next/link";
 
 export default function SideMenuHead({ config, bookName }) {
     return (
-        <Box borderBottom='1px solid rgba(0, 0, 0, 0.1)' pb={24} py={32} bg='lilac' px={32}>
+        <Box
+            borderBottom='1px solid rgba(0, 0, 0, 0.1)'
+            pb={24}
+            py={32}
+            bg='lilac'
+            px={32}
+            borderRadius={10}>
             <Link href={`/books/${bookName}`}>
                 <Box display='flex' alignItems='center' justifyContent='flex-start' gap={12}>
                     <Icon name={`${bookName}_icon`} width={48} height='100%' />

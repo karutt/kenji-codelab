@@ -21,6 +21,12 @@ const SideMenuCard = styled(Card)`
     top: 32px;
     height: calc(100vh - 64px);
     overflow: scroll;
+    padding-bottom: 120px;
+`;
+
+const SideMenuHeadCard = styled(Card)`
+    padding: 0;
+    margin-bottom: 8px;
 `;
 
 const ArticleCard = styled(Card)`
@@ -29,4 +35,4 @@ const ArticleCard = styled(Card)`
     padding-bottom: 32px;
 `;
 
-export { Card, SideMenuCard, ArticleCard };
+export { Card, SideMenuCard, ArticleCard, SideMenuHeadCard };

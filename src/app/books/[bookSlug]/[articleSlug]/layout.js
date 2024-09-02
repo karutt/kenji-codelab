@@ -12,7 +12,7 @@ export default function Layout({ children, params }) {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "stretch",
-                background: "#F3F5FB",
+                background: "#EDF2F6",
             }}>
             <SideMenu config={config} bookName={bookSlug} articleSlug={articleSlug} />
             {children}
