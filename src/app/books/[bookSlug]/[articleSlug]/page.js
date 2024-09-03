@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import Article from "@/components/Article/Article";
 import matter from "gray-matter";
+import WebSocketClient from "@/components/WebSocketClient"; //
 
 export default function Page({ params }) {
     const { bookSlug, articleSlug } = params;
@@ -17,6 +18,7 @@ export default function Page({ params }) {
                 articleSlug={articleSlug}
                 bookSlug={bookSlug}
             />
+            <WebSocketClient />
         </div>
     );
 }

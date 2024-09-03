@@ -41,7 +41,12 @@ export default function Footer() {
                             gap={24}
                             fontWeight={400}>
                             <Icon name={contact.iconName} width={24} height='100%' />
-                            <Link href={contact.value}>{contact.value}</Link>
+                            {/* メールかどうか判定 */}
+                            {contact.mail ? (
+                                <Link href={`mailto:${contact.value}`}>{contact.value}</Link>
+                            ) : (
+                                <Link href={contact.value}>{contact.value}</Link>
+                            )}
                         </Box>
                     ))}
                 </Box>
