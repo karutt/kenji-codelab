@@ -7,7 +7,7 @@ export default function SideMenuHead({ config, bookName }) {
             borderBottom='1px solid rgba(0, 0, 0, 0.1)'
             pb={24}
             py={32}
-            bg='lilac'
+            bg='white'
             px={32}
             borderRadius={10}>
             <Link href={`/books/${bookName}`}>
