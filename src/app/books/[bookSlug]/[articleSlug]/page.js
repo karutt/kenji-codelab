@@ -41,7 +41,7 @@ export default function Page({ params }) {
                 articleSlug={articleSlug}
                 bookSlug={bookSlug}
             />
-            <WebSocketClient />
+            {/* <WebSocketClient /> */}
         </div>
     );
 }

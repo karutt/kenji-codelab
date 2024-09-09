@@ -1,16 +1,29 @@
 // components/ProblemSet/ProblemSet.jsx
 "use client";
 
-import React, { useState } from "react";
 import Editor from "react-simple-code-editor";
-import highlight from "highlight.js";
-import "highlight.js/styles/github.css";
+import hljs from "highlight.js/lib/core"; // highlight.jsのコアモジュールをインポート
+import javascript from "highlight.js/lib/languages/javascript"; // JavaScriptのシンタックスハイライトをインポート
+import "highlight.js/styles/github-dark-dimmed.css"; // ダークテーマのCSSをインポート
+import { useState } from "react";
+
 import markdownHtml from "zenn-markdown-html";
 import "zenn-content-css";
 import { parseProblemContent } from "./utils";
 import { addCodeToNotion } from "@/components/notion/actions"; // Server Actionをインポート
+import { ProbBtn2, BlueBtn } from "@/components/common/Btn";
+import { background } from "styled-system";
 
-function ProblemSet({ problemMarkdown }) {
+function ProblemSet({
+    problemMarkdown,
+    articleSlug,
+    bookSlug,
+    onClick,
+    showProblemBtn,
+    showProblem,
+}) {
+    hljs.registerLanguage("javascript", javascript);
+
     // MarkdownをHTMLに変換
     const problemHtml = markdownHtml(problemMarkdown);
 
@@ -25,13 +38,15 @@ function ProblemSet({ problemMarkdown }) {
     const [submittedCodes, setSubmittedCodes] = useState(Array(problemHeaders.length).fill(""));
 
     // コード提出ハンドラー
-    const handleCodeSubmit = async (index) => {
-        const code = submittedCodes[index];
-        const title = `問題 ${index + 1}`;
+    const handleCodeSubmit = async (ind) => {
+        const code = submittedCodes[ind];
+        const title = `問題 ${ind + 1}`;
+        const name = localStorage.getItem("kenji_name");
+        const index = ind + 1;
 
         try {
-            await addCodeToNotion({ title, code }); // Server Actionを呼び出してコードをストック
-            alert(`問題 ${index + 1} のコードがNotionに提出されました！`);
+            await addCodeToNotion({ title, code, name, index, articleSlug, bookSlug }); // Server Actionを呼び出してコードをストック
+            alert(`問題 ${ind + 1} のコードがNotionに提出されました！`);
         } catch (error) {
             console.error("Notionへの提出エラー:", error);
             alert("コードの提出に失敗しました。再度お試しください。");
@@ -61,35 +76,36 @@ function ProblemSet({ problemMarkdown }) {
                     <Editor
                         value={submittedCodes[index]}
                         onValueChange={(code) => handleCodeChange(index, code)}
-                        highlight={(code) => highlight.highlightAuto(code).value}
+                        highlight={(code) => hljs.highlight(code, { language: "javascript" }).value} // 言語を指定
                         padding={10}
+                        placeholder='提出コードを入力してください'
+                        className='editor'
                         style={{
                             fontFamily: '"Fira code", "Fira Mono", monospace',
-                            fontSize: 14,
+                            fontSize: 15,
                             border: "1px solid #ddd",
-                            borderRadius: "4px",
+                            borderRadius: "6px",
+                            backgroundColor: "#192638",
                             minHeight: "200px",
+                            lineHeight: "1.5em",
+                            color: "#C0C5DB",
+                            marginBottom: "16px",
                         }}
                     />
-                    <button
-                        onClick={() => handleCodeSubmit(index)}
-                        style={{
-                            marginTop: "8px",
-                            padding: "10px 20px",
-                            backgroundColor: "#28a745",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                        }}>
-                        コードを提出
-                    </button>
+
+                    <BlueBtn onClick={() => handleCodeSubmit(index)}>コードを提出</BlueBtn>
                 </div>
             </div>
         );
     });
 
-    return <div>{formattedProblems}</div>;
+    return (
+        <div>
+            {formattedProblems}
+
+            <ProbBtn2 toggle={showProblem} onClick={onClick} />
+        </div>
+    );
 }
 
 export default ProblemSet;

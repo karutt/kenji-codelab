@@ -1,9 +1,18 @@
 import { Box, Icon } from "@/styles";
 import Breadcrumb from "./Breadcrumb";
+import { ProbBtn } from "@/components/common/Btn";
 
-export default function ArticleHead({ frontMatter, articleSlug, bookSlug }) {
+export default function ArticleHead({
+    frontMatter,
+    articleSlug,
+    bookSlug,
+    onClick,
+    showProblemBtn,
+    showProblem,
+}) {
     return (
-        <Box mb={32} bg='lilac' py={32} px={44} borderRadius={10}>
+        <Box mb={32} bg='lilac' py={32} px={44} borderRadius={10} position='relative'>
+            {showProblemBtn ? <ProbBtn toggle={showProblem} onClick={onClick} /> : ""}
             <Box>
                 <Breadcrumb bookName={bookSlug} chapter={articleSlug} />
                 <Box

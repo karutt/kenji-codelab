@@ -16,3 +16,8 @@ a:hover {
     font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans",
         Meiryo, sans-serif, "Segoe UI Emoji";
 }
+
+.editor pre,
+.editor textarea {
+    padding: 24px !important;
+}

@@ -24,5 +24,6 @@ export const theme = {
         blue75: "rgba(55, 85, 190, 0.75)",
         lightBlue: "#E0E5F4",
         zennBlue: "#EDF2F6",
+        green: "#28a745",
     },
 };

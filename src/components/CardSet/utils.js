@@ -1,9 +1,9 @@
-// components/CardlemSet/utils.js
+// components/CardSet/utils.js
 
 // 問題文と選択肢を解析する関数
-export function parseCardlemContent(header) {
+export function parseCardContent(header) {
     let currentElement = header.nextElementSibling;
-    const cardlemContent = [];
+    const cardContent = [];
     let choices = [];
 
     // <h2>タグが来るまでの要素を収集
@@ -18,12 +18,12 @@ export function parseCardlemContent(header) {
             });
         } else {
             // それ以外の要素は問題文の詳細に追加
-            cardlemContent.push(currentElement.outerHTML);
+            cardContent.push(currentElement.outerHTML);
         }
         currentElement = currentElement.nextElementSibling;
     }
 
-    return { cardlemContent: cardlemContent.join(" "), choices };
+    return { cardContent: cardContent.join(" "), choices };
 }
 
 // 解説文を解析する関数

@@ -20,8 +20,19 @@ const SideMenuCard = styled(Card)`
     padding: 0;
     top: 32px;
     height: calc(100vh - 64px);
-    overflow: scroll;
+    overflow: auto;
     padding-bottom: 120px;
+
+    /* WebKitベースのブラウザ（Chrome、Safari、新しいEdgeなど）用 */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* IE、Edgeの古いバージョン用 */
+    -ms-overflow-style: none;
+
+    /* Firefox用 */
+    scrollbar-width: none;
 `;
 
 const SideMenuHeadCard = styled(Card)`

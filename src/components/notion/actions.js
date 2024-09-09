@@ -12,10 +12,40 @@ export async function addCodeToNotion(data) {
                     title: [
                         {
                             text: {
-                                content: data.title,
+                                content: data.articleSlug + "-" + data.index,
                             },
                         },
                     ],
+                },
+                Name: {
+                    rich_text: [
+                        {
+                            text: {
+                                content: data.name,
+                            },
+                        },
+                    ],
+                },
+                Section: {
+                    rich_text: [
+                        {
+                            text: {
+                                content: data.articleSlug,
+                            },
+                        },
+                    ],
+                },
+                Book: {
+                    rich_text: [
+                        {
+                            text: {
+                                content: data.bookSlug,
+                            },
+                        },
+                    ],
+                },
+                Index: {
+                    number: data.index,
                 },
             },
             children: [
