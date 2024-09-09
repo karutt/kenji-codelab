@@ -81,7 +81,8 @@ function ProblemSet({
                         placeholder='提出コードを入力してください'
                         className='editor'
                         style={{
-                            fontFamily: '"Fira code", "Fira Mono", monospace',
+                            fontFamily:
+                                '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
                             fontSize: 15,
                             border: "1px solid #ddd",
                             borderRadius: "6px",
