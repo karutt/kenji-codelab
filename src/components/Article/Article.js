@@ -25,6 +25,9 @@ export default function Article({ markdown, card, problem, frontMatter, articleS
         setShowCard((prevShowCard) => !prevShowCard);
         setShowProblem(false); // 別の表示を非表示にする
         setShowSideMenu(true);
+
+        // 画面のトップにスムーズにスクロールする
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const toggleProblemView = () => {
@@ -71,7 +74,7 @@ export default function Article({ markdown, card, problem, frontMatter, articleS
     const showProblemBtn = problem ? true : false;
 
     return (
-        <Box as='article' className='znc' color='shark' my={32}>
+        <Box as='article' className='znc' color='shark' my={32} width='100%' maxWidth={860}>
             <ArticleCard>
                 <ArticleHead
                     frontMatter={frontMatter}
@@ -81,7 +84,7 @@ export default function Article({ markdown, card, problem, frontMatter, articleS
                     showProblem={showProblem}
                     onClick={toggleProblemView}
                 />
-                <Box className='main' px={64}>
+                <Box className='main' px={64} pb={64}>
                     {/* 状態に基づいて表示を切り替える */}
                     {showCard ? (
                         <CardSet cardMarkdown={card} />

@@ -1,11 +1,10 @@
-// components/CardSet/CardSet.jsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import markdownHtml from "zenn-markdown-html";
 import "zenn-content-css";
 import Choices from "./Choices";
-import ShuffleResetButtons from "./ShuffleResetButtons"; // シャッフルとリセットボタンのコンポーネントをインポート
+import ShuffleResetButtons from "./ShuffleResetButtons";
 import { parseCardContent, parseExplanationContent, shuffleArray } from "./utils"; // shuffleArrayもインポート
 
 function CardSet({ cardMarkdown }) {
@@ -16,17 +15,60 @@ function CardSet({ cardMarkdown }) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(card_html, "text/html");
 
-    // 問題と解説を分割するための準備
-    const [cardHeaders, setCardHeaders] = useState(
-        Array.from(doc.querySelectorAll("h1")) // <h1>要素を取得（問題文）
-    );
+    // 問題と解説をペアで取得
+    const cardHeaders = Array.from(doc.querySelectorAll("h1")); // <h1>要素を取得（問題文）
     const explanationHeaders = Array.from(doc.querySelectorAll("h2")); // <h2>要素を取得（解説文）
 
+    // 問題と解説をペアにする
+    const [cardPairs, setCardPairs] = useState(
+        cardHeaders.map((header, index) => ({
+            question: header,
+            explanation: explanationHeaders[index],
+        }))
+    );
+
+    // シャッフルされた選択肢を保持する状態
+    const [shuffledChoices, setShuffledChoices] = useState([]);
+
     // 状態管理：選択した選択肢と解説の表示状態を管理
-    const [selectedChoices, setSelectedChoices] = useState(Array(cardHeaders.length).fill(null));
-    const [showExplanations, setShowExplanations] = useState(Array(cardHeaders.length).fill(false));
+    const [selectedChoices, setSelectedChoices] = useState(Array(cardPairs.length).fill(null));
+    const [showExplanations, setShowExplanations] = useState(Array(cardPairs.length).fill(false));
     const [isAllAnswered, setIsAllAnswered] = useState(false); // すべての問題が回答されたかのフラグ
     const [correctCount, setCorrectCount] = useState(0); // 正解数のカウント
+
+    // 選択肢のシャッフルを初期化するためのuseEffect
+    useEffect(() => {
+        initializeShuffledChoices();
+    }, [cardPairs]); // cardPairsが変更されたとき（リセットやシャッフル時）に再実行
+
+    // キーボードイベントを設定するuseEffect
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key.toLowerCase() === "r") {
+                handleReset(); // 'R'キーでリセット
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        // クリーンアップ: イベントリスナーを解除
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, []); // 初回レンダリング時のみ設定
+
+    const initializeShuffledChoices = () => {
+        const initialShuffledChoices = cardPairs.map(({ question }) => {
+            const { choices } = parseCardContent(question);
+            // シャッフル前のインデックスを持つ選択肢の配列を作成
+            const choicesWithIndex = choices.map((choice, index) => ({
+                choice,
+                originalIndex: index, // 元のインデックスを保持
+            }));
+            return shuffleArray(choicesWithIndex); // 選択肢をシャッフル
+        });
+        setShuffledChoices(initialShuffledChoices);
+    };
 
     // 選択肢の選択ハンドラー
     const handleSelect = (index, choiceIndex) => {
@@ -45,61 +87,70 @@ function CardSet({ cardMarkdown }) {
         if (selectedChoices.every((choice) => choice !== null)) {
             setIsAllAnswered(true); // すべての問題に回答が選択された場合はtrue
             // 正解数を計算
-            const correctAnswers = cardHeaders.reduce((count, header, index) => {
-                const { choices } = parseCardContent(header);
+            const correctAnswers = cardPairs.reduce((count, { question }, index) => {
+                const { choices } = parseCardContent(question);
                 const selectedChoiceIndex = selectedChoices[index];
-                return count + (choices[selectedChoiceIndex]?.isCorrect ? 1 : 0);
+                const selectedChoice = shuffledChoices[index][selectedChoiceIndex];
+
+                // 元のインデックスを使って正解をチェック
+                return count + (choices[selectedChoice.originalIndex]?.isCorrect ? 1 : 0);
             }, 0);
             setCorrectCount(correctAnswers);
         } else {
             setIsAllAnswered(false);
         }
-    }, [selectedChoices, cardHeaders]);
+    }, [selectedChoices, cardPairs, shuffledChoices]);
 
     // 問題の順序をシャッフルするハンドラー
     const handleShuffle = () => {
-        setCardHeaders(shuffleArray(cardHeaders));
+        setCardPairs(shuffleArray(cardPairs));
         // シャッフルしたら選択もリセット
         handleReset();
     };
 
     // 選択をリセットするハンドラー
     const handleReset = () => {
-        setSelectedChoices(Array(cardHeaders.length).fill(null));
-        setShowExplanations(Array(cardHeaders.length).fill(false));
+        setSelectedChoices(Array(cardPairs.length).fill(null));
+        setShowExplanations(Array(cardPairs.length).fill(false));
         setIsAllAnswered(false);
+        initializeShuffledChoices(); // 選択肢も再シャッフル
     };
 
     // 各問題を解析し、表示するための要素を生成
-    const formattedCards = cardHeaders.map((header, index) => {
+    const formattedCards = cardPairs.map(({ question, explanation }, index) => {
         // 問題文と選択肢を解析
-        const { cardContent, choices } = parseCardContent(header);
+        const { cardContent } = parseCardContent(question);
+
+        // シャッフルされた選択肢を取得
+        const choices = shuffledChoices[index] || [];
 
         // 解説部分の取得
-        const explanationHTML = parseExplanationContent(explanationHeaders[index]);
+        const explanationHTML = parseExplanationContent(explanation);
 
         return (
             <div key={index} className='card' style={{ marginBottom: "64px" }}>
                 <h3 style={{ fontSize: "20px" }}>
-                    {index + 1}. {header.textContent}
+                    {index + 1}. {question.textContent}
                 </h3>
                 {/* 問題文、詳細、コードブロックを表示 */}
                 <div dangerouslySetInnerHTML={{ __html: cardContent }} />
                 {/* 選択肢をコンポーネントとして表示 */}
-                {choices.length > 0 && (
-                    <Choices
-                        choices={choices}
-                        onSelect={(choiceIndex) => handleSelect(index, choiceIndex)}
-                        selectedChoice={selectedChoices[index]} // 現在の選択状態を渡す
-                    />
-                )}
+                <div style={{ marginTop: "32px" }}>
+                    {choices.length > 0 && (
+                        <Choices
+                            choices={choices.map((c) => c.choice)} // シャッフルされた選択肢を使用
+                            onSelect={(choiceIndex) => handleSelect(index, choiceIndex)}
+                            selectedChoice={selectedChoices[index]} // 現在の選択状態を渡す
+                        />
+                    )}
+                </div>
                 {/* 解説を表示 */}
                 {showExplanations[index] && (
                     <div
                         style={{
                             marginTop: "16px",
-                            backgroundColor: "#f8f9fa",
-                            padding: "12px",
+                            backgroundColor: "#F8F9FA",
+                            padding: "24px",
                             borderRadius: "4px",
                         }}
                         dangerouslySetInnerHTML={{ __html: explanationHTML }}
@@ -118,13 +169,13 @@ function CardSet({ cardMarkdown }) {
                     style={{
                         marginTop: "0px",
                         padding: "16px",
-                        backgroundColor: "#e0e0e0",
+                        backgroundColor: "#F8F9FA",
                         borderRadius: "8px",
                         position: "relative",
                     }}>
                     <p>結果</p>
                     <p>
-                        {cardHeaders.length}個中{correctCount}個正解しました。
+                        {cardPairs.length}個中{correctCount}個正解しました。
                     </p>
                     {/* シャッフルとリセットボタンを結果表示の中に配置 */}
                     <ShuffleResetButtons onShuffle={handleShuffle} onReset={handleReset} />

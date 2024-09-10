@@ -2,6 +2,7 @@
 "use client";
 
 import { Box } from "@/styles";
+import { fontSize, padding } from "styled-system";
 
 function Choices({ choices, onSelect, selectedChoice }) {
     return (
@@ -13,6 +14,8 @@ function Choices({ choices, onSelect, selectedChoice }) {
                         display: "block",
                         margin: "4px 0",
                         padding: "8px",
+                        paddingLeft: "12px",
+                        fontSize: "15px",
                         border: "1px solid #ddd",
                         borderRadius: "4px",
                         cursor: "pointer",

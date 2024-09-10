@@ -32,7 +32,7 @@ export default function Page({ params }) {
     }
 
     return (
-        <div>
+        <>
             <Article
                 markdown={content}
                 card={cardContent}
@@ -42,7 +42,7 @@ export default function Page({ params }) {
                 bookSlug={bookSlug}
             />
             {/* <WebSocketClient /> */}
-        </div>
+        </>
     );
 }
 

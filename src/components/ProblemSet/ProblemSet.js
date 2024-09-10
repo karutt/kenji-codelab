@@ -1,4 +1,3 @@
-// components/ProblemSet/ProblemSet.jsx
 "use client";
 
 import Editor from "react-simple-code-editor";
@@ -12,7 +11,6 @@ import "zenn-content-css";
 import { parseProblemContent } from "./utils";
 import { addCodeToNotion } from "@/components/notion/actions"; // Server Actionをインポート
 import { ProbBtn2, BlueBtn } from "@/components/common/Btn";
-import { background } from "styled-system";
 
 function ProblemSet({
     problemMarkdown,
@@ -36,9 +34,17 @@ function ProblemSet({
 
     // 状態管理：ユーザーが入力したコードの状態を管理
     const [submittedCodes, setSubmittedCodes] = useState(Array(problemHeaders.length).fill(""));
+    const [isSubmitting, setIsSubmitting] = useState(Array(problemHeaders.length).fill(false)); // 提出状態を管理
 
     // コード提出ハンドラー
     const handleCodeSubmit = async (ind) => {
+        if (isSubmitting[ind]) return; // 既に提出中の場合は何もしない
+
+        // 提出中状態に設定
+        const updatedIsSubmitting = [...isSubmitting];
+        updatedIsSubmitting[ind] = true;
+        setIsSubmitting(updatedIsSubmitting); // 状態を更新
+
         const code = submittedCodes[ind];
         const title = `問題 ${ind + 1}`;
         const name = localStorage.getItem("kenji_name");
@@ -50,6 +56,11 @@ function ProblemSet({
         } catch (error) {
             console.error("Notionへの提出エラー:", error);
             alert("コードの提出に失敗しました。再度お試しください。");
+        } finally {
+            // 提出処理完了後に提出状態をリセット
+            const resetIsSubmitting = [...isSubmitting];
+            resetIsSubmitting[ind] = false;
+            setIsSubmitting(resetIsSubmitting); // 状態を再度更新
         }
     };
 
@@ -63,7 +74,7 @@ function ProblemSet({
     // 各問題を解析し、表示するための要素を生成
     const formattedProblems = problemHeaders.map((header, index) => {
         // 問題文の詳細を解析
-        const { problemContent, codeSnippet } = parseProblemContent(header);
+        const { problemContent } = parseProblemContent(header);
 
         return (
             <div key={index} className='problem' style={{ marginBottom: "32px" }}>
@@ -94,7 +105,12 @@ function ProblemSet({
                         }}
                     />
 
-                    <BlueBtn onClick={() => handleCodeSubmit(index)}>コードを提出</BlueBtn>
+                    <BlueBtn
+                        onClick={() => handleCodeSubmit(index)}
+                        disabled={isSubmitting[index]} // 提出中はボタンを無効化
+                    >
+                        {isSubmitting[index] ? "提出中..." : "コードを提出"}
+                    </BlueBtn>
                 </div>
             </div>
         );
