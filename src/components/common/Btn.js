@@ -131,3 +131,30 @@ export function ProbBtn2({ toggle, onClick }) {
         </Box>
     );
 }
+
+export const WBtn = styled(Box)`
+    display: inline-block;
+    padding: 8px 20px;
+    background-color: ${(props) => props.theme.colors.white};
+    color: ${(props) => props.theme.colors.shark};
+    font-weight: 400;
+    border: 1px solid #e1e1e1;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none !important;
+    &:hover {
+        opacity: 0.85;
+        transition: 0.3s;
+    }
+    &:active {
+        opacity: 1;
+        transition: 0.3s;
+    }
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+`;

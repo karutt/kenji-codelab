@@ -22,6 +22,7 @@ export const theme = {
         lilac: "#F3F5FB",
         hitGray: "#ADB5BD",
         blue75: "rgba(55, 85, 190, 0.75)",
+        geyser: "#DEE2E6",
         lightBlue: "#E0E5F4",
         zennBlue: "#EDF2F6",
         green: "#28a745",

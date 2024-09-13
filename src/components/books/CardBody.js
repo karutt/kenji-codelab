@@ -27,7 +27,7 @@ export default function CardBody({ list, bookName, section }) {
                         href={`/books/${bookName}/${
                             String(section + 1) + "-" + String(subSection + 1)
                         }`}>
-                        {title}
+                        <Box fontWeight='400'>{title}</Box>
                     </Link>
                 </Box>
             ))}
