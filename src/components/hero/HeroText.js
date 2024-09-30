@@ -21,7 +21,7 @@ const HeroText = () => {
             </Box>
             <Box as='p' fontSize={16} lineHeight='180%' maxWidth={500}>
                 KeNJi
-                CodeLabは、プログラミングを楽しく学べる場所。創造力を刺激する学習記事やチュートリアルも充実。
+                CodeLabは、東京賢治シュタイナー学校の、プログラミング教育のための学内プラットフォームです。
             </Box>
             <Box display='flex' gap={32}>
                 <Link href='books/p5_tutorial' style={{ textDecoration: "none" }}>

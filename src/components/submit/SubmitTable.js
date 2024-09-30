@@ -106,7 +106,7 @@ export default function SubmitTable({
                                 {data.data.map((submission) => (
                                     <tr key={submission.id}>
                                         <td>
-                                            <Link href={`/submit/${submission.id}`}>
+                                            <Link href={`/submit/content/${submission.id}`}>
                                                 {submission.Title}
                                             </Link>
                                         </td>

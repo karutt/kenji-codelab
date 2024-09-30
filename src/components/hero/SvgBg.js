@@ -6,10 +6,10 @@ const SvgBg = () => (
             <Icon name='shark_shape' width='663px' height='100%' />
         </Box>
         <Box position='absolute' right='-100px' bottom='-200px'>
-            <Icon name='red_shape' width={624} height='100%' />
+            <Icon name='red_shape' width={624} height='10%' />
         </Box>
-        <Box position='absolute' right='0px' bottom='0px'>
-            <Icon name='white_shape' width='100vw' height='100%' />
+        <Box position='absolute' right='0px' bottom='-5px'>
+            <Icon name='white_shape' width='100vw' height='180px' />
         </Box>
     </>
 );
