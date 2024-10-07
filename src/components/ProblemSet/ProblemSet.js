@@ -1,9 +1,9 @@
 "use client";
 
 import Editor from "react-simple-code-editor";
-import hljs from "highlight.js/lib/core"; // highlight.jsのコアモジュールをインポート
-import javascript from "highlight.js/lib/languages/javascript"; // JavaScriptのシンタックスハイライトをインポート
-import "highlight.js/styles/github-dark-dimmed.css"; // ダークテーマのCSSをインポート
+import hljs from "highlight.js/lib/core";
+import javascript from "highlight.js/lib/languages/javascript";
+import "highlight.js/styles/github-dark-dimmed.css";
 import { useState } from "react";
 
 import markdownHtml from "zenn-markdown-html";
