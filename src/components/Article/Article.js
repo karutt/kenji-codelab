@@ -1,44 +1,75 @@
 // components/Article.js
 "use client";
 
-import React, { useState, useEffect } from "react"; // useStateをインポート
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation"; // 追加
 import markdownHtml from "zenn-markdown-html";
 import "zenn-content-css";
 import { Box } from "@/styles";
 import { ArticleCard } from "@/components/common/Card";
 import ArticleHead from "./ArticleHead";
 import CardSet from "@/components/CardSet/CardSet";
-import ProblemSet from "@/components/ProblemSet/ProblemSet"; // ProblemSetをインポート
-import { ToggleBtn } from "@/components/common/Btn"; // ToggleBtnをインポート
+import ProblemSet from "@/components/ProblemSet/ProblemSet";
+import { ToggleBtn } from "@/components/common/Btn";
 import Modal from "@/components/common/Modal";
 import { useSideMenu } from "@/components/SideMenu/SideMenuContext";
 import { InputField } from "@/components/common/Input";
+import { Suspense } from "react"; // Suspenseをインポート
 
-export default function Article({ markdown, card, problem, frontMatter, articleSlug, bookSlug }) {
+export default function Article(props) {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ArticleContent {...props} />
+        </Suspense>
+    );
+}
+
+function ArticleContent({ markdown, card, problem, frontMatter, articleSlug, bookSlug }) {
     const article_html = markdownHtml(markdown);
-    // 記事、問題セット、カードセットの表示を切り替えるための状態管理
     const [showCard, setShowCard] = useState(false);
     const [showProblem, setShowProblem] = useState(false);
     const { showSideMenu, setShowSideMenu } = useSideMenu();
+    const router = useRouter(); // useRouterの使用
+    const searchParams = useSearchParams(); // 現在のクエリパラメータを取得
+    const pathname = usePathname(); // 現在のパスを取得
 
-    // ボタンクリック時のハンドラー
+    // 初期レンダリングでURLクエリに基づいて状態を設定
+    useEffect(() => {
+        const view = searchParams.get("view");
+        if (view === "card") {
+            setShowCard(true);
+            setShowProblem(false);
+        } else if (view === "problem") {
+            setShowProblem(true);
+            setShowCard(false);
+            setShowSideMenu(false);
+        } else {
+            setShowCard(false);
+            setShowProblem(false); // 初期状態に戻す
+            setShowSideMenu(true);
+        }
+    }, [searchParams, setShowSideMenu]); //
+
     const toggleCardView = () => {
-        setShowCard((prevShowCard) => !prevShowCard);
-        setShowProblem(false); // 別の表示を非表示にする
-        setShowSideMenu(true);
-
-        // 画面のトップにスムーズにスクロールする
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (showCard) {
+            setShowCard(false);
+            setShowProblem(false);
+            router.back();
+        } else {
+            setShowCard(true);
+            setShowProblem(false);
+            router.push("?view=card", { scroll: false });
+        }
     };
 
     const toggleProblemView = () => {
         if (showProblem) {
             setShowProblem(false);
-            setShowCard(false); // 別の表示を非表示にする
             setShowSideMenu(true);
+            router.back();
             return;
         }
-        setIsModalOpen(true);
+        setIsModalOpen(true); // まずはモーダルを開く
     };
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,19 +91,20 @@ export default function Article({ markdown, card, problem, frontMatter, articleS
     };
 
     const saveNameToLocalStorage = () => {
-        setShowProblem((prevShowProblem) => !prevShowProblem);
-        setShowCard(false); // 別の表示を非表示にする
-        setShowSideMenu(false);
         if (name.trim()) {
             localStorage.setItem("kenji_name", name);
-            closeModal(); // 保存後モーダルを閉じる
+            setIsModalOpen(false); // モーダルを閉じる
+            setShowProblem(true); // 問題画面を表示
+            setShowCard(false); // カードを非表示
+            router.push("?view=problem", { scroll: false }); // URLを更新
+            setShowSideMenu(false);
         } else {
             alert("名前を入力してください！");
         }
     };
 
-    const showCardBtn = card ? true : false;
-    const showProblemBtn = problem ? true : false;
+    const showCardBtn = Boolean(card);
+    const showProblemBtn = Boolean(problem);
 
     return (
         <Box as='article' className='znc' color='shark' my={32} width='100%' maxWidth={860}>
@@ -86,7 +118,6 @@ export default function Article({ markdown, card, problem, frontMatter, articleS
                     onClick={toggleProblemView}
                 />
                 <Box className='main' px={64} pb={64}>
-                    {/* 状態に基づいて表示を切り替える */}
                     {showCard ? (
                         <CardSet cardMarkdown={card} />
                     ) : showProblem ? (
@@ -104,7 +135,7 @@ export default function Article({ markdown, card, problem, frontMatter, articleS
                 </Box>
             </ArticleCard>
 
-            {showCardBtn ? <ToggleBtn toggle={showCard} onClick={toggleCardView} /> : ""}
+            {showCardBtn && <ToggleBtn toggle={showCard} onClick={toggleCardView} />}
 
             <Modal isOpen={isModalOpen}>
                 <Box fontSize={24} fontWeight='bold' mb={8}>

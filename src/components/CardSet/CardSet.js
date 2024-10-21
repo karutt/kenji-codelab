@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import markdownHtml from "zenn-markdown-html";
 import "zenn-content-css";
 import Choices from "./Choices";
@@ -36,12 +36,33 @@ function CardSet({ cardMarkdown }) {
     const [isAllAnswered, setIsAllAnswered] = useState(false); // すべての問題が回答されたかのフラグ
     const [correctCount, setCorrectCount] = useState(0); // 正解数のカウント
 
-    // 選択肢のシャッフルを初期化するためのuseEffect
+    // 選択肢のシャッフルを初期化する関数を useCallback でメモ化
+    const initializeShuffledChoices = useCallback(() => {
+        const initialShuffledChoices = cardPairs.map(({ question }) => {
+            const { choices } = parseCardContent(question);
+            // シャッフル前のインデックスを持つ選択肢の配列を作成
+            const choicesWithIndex = choices.map((choice, index) => ({
+                choice,
+                originalIndex: index, // 元のインデックスを保持
+            }));
+            return shuffleArray(choicesWithIndex); // 選択肢をシャッフル
+        });
+        setShuffledChoices(initialShuffledChoices);
+    }, [cardPairs]); // 関数が参照する依存関係を指定
+
+    // キーボードイベントのハンドラも useCallback でメモ化
+    const handleReset = useCallback(() => {
+        setSelectedChoices(Array(cardPairs.length).fill(null));
+        setShowExplanations(Array(cardPairs.length).fill(false));
+        setIsAllAnswered(false);
+        initializeShuffledChoices(); // 選択肢も再シャッフル
+    }, [cardPairs, initializeShuffledChoices]);
+
+    // 選択肢のシャッフルを初期化するための useEffect
     useEffect(() => {
         initializeShuffledChoices();
-    }, [cardPairs]); // cardPairsが変更されたとき（リセットやシャッフル時）に再実行
-
-    // キーボードイベントを設定するuseEffect
+    }, [initializeShuffledChoices]);
+    // キーボードイベントを設定する useEffect
     useEffect(() => {
         const handleKeyDown = (event) => {
             if (event.key.toLowerCase() === "r") {
@@ -55,20 +76,9 @@ function CardSet({ cardMarkdown }) {
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         };
-    }, []); // 初回レンダリング時のみ設定
+    }, [handleReset]);
 
-    const initializeShuffledChoices = () => {
-        const initialShuffledChoices = cardPairs.map(({ question }) => {
-            const { choices } = parseCardContent(question);
-            // シャッフル前のインデックスを持つ選択肢の配列を作成
-            const choicesWithIndex = choices.map((choice, index) => ({
-                choice,
-                originalIndex: index, // 元のインデックスを保持
-            }));
-            return shuffleArray(choicesWithIndex); // 選択肢をシャッフル
-        });
-        setShuffledChoices(initialShuffledChoices);
-    };
+    // 選択をリセットするハンドラー
 
     // 選択肢の選択ハンドラー
     const handleSelect = (index, choiceIndex) => {
@@ -106,14 +116,6 @@ function CardSet({ cardMarkdown }) {
         setCardPairs(shuffleArray(cardPairs));
         // シャッフルしたら選択もリセット
         handleReset();
-    };
-
-    // 選択をリセットするハンドラー
-    const handleReset = () => {
-        setSelectedChoices(Array(cardPairs.length).fill(null));
-        setShowExplanations(Array(cardPairs.length).fill(false));
-        setIsAllAnswered(false);
-        initializeShuffledChoices(); // 選択肢も再シャッフル
     };
 
     // 各問題を解析し、表示するための要素を生成

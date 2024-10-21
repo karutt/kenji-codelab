@@ -48,7 +48,7 @@ export default function SubmitContent() {
         if (newPage !== currentPage) setCurrentPage(newPage);
         if (JSON.stringify(newPreviousCursors) !== JSON.stringify(previousCursors))
             setPreviousCursors(newPreviousCursors);
-    }, [searchParams]); // searchParamsの変化を監視
+    }, [currentCursor, currentPage, filterName, pageSize, previousCursors, searchParams]); // searchParamsの変化を監視
 
     // クエリパラメータをURLに反映させ、履歴に追加
     useEffect(() => {
