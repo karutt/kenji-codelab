@@ -4,7 +4,7 @@ import Editor from "react-simple-code-editor";
 import hljs from "highlight.js/lib/core";
 import javascript from "highlight.js/lib/languages/javascript";
 import "highlight.js/styles/github-dark-dimmed.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import markdownHtml from "zenn-markdown-html";
 import "zenn-content-css";
@@ -12,14 +12,7 @@ import { parseProblemContent } from "./utils";
 import { addCodeToNotion } from "@/components/notion/actions"; // Server Actionをインポート
 import { ProbBtn2, BlueBtn } from "@/components/common/Btn";
 
-function ProblemSet({
-    problemMarkdown,
-    articleSlug,
-    bookSlug,
-    onClick,
-    showProblemBtn,
-    showProblem,
-}) {
+function ProblemSet({ problemMarkdown, articleSlug, bookSlug, onClick, showProblem }) {
     hljs.registerLanguage("javascript", javascript);
 
     // MarkdownをHTMLに変換
@@ -68,10 +61,19 @@ function ProblemSet({
     const handleCodeChange = (index, value) => {
         const updatedCodes = [...submittedCodes];
         updatedCodes[index] = value;
+        console.log(value, updatedCodes);
         setSubmittedCodes(updatedCodes);
     };
 
-    // 各問題を解析し、表示するための要素を生成
+    useEffect(() => {
+        const updatedCodes = [...submittedCodes];
+        problemHeaders.forEach((header, index) => {
+            const { _, defaultCode } = parseProblemContent(header);
+            updatedCodes[index] = defaultCode;
+            setSubmittedCodes(updatedCodes);
+        });
+    }, []);
+
     const formattedProblems = problemHeaders.map((header, index) => {
         // 問題文の詳細を解析
         const { problemContent } = parseProblemContent(header);
