@@ -5,6 +5,7 @@ import hljs from "highlight.js/lib/core";
 import javascript from "highlight.js/lib/languages/javascript";
 import "highlight.js/styles/github-dark-dimmed.css";
 import { useState, useEffect } from "react";
+import "zenn-content-css";
 
 import markdownHtml from "zenn-markdown-html";
 import "zenn-content-css";
@@ -21,6 +22,7 @@ function ProblemSet({ problemMarkdown, articleSlug, bookSlug, onClick, showProbl
     // HTMLをDOMとして解析する
     const parser = new DOMParser();
     const doc = parser.parseFromString(problemHtml, "text/html");
+    console.log(doc);
 
     // 問題文を取得（<h1>要素が各問題のタイトル）
     const problemHeaders = Array.from(doc.querySelectorAll("h1"));
@@ -72,6 +74,9 @@ function ProblemSet({ problemMarkdown, articleSlug, bookSlug, onClick, showProbl
             updatedCodes[index] = defaultCode;
             setSubmittedCodes(updatedCodes);
         });
+    }, []);
+    useEffect(() => {
+        import("zenn-embed-elements");
     }, []);
 
     const formattedProblems = problemHeaders.map((header, index) => {

@@ -83,6 +83,9 @@ importers:
       zenn-content-css:
         specifier: ^0.1.155
         version: 0.1.155
+      zenn-embed-elements:
+        specifier: ^0.1.158
+        version: 0.1.158
       zenn-markdown-html:
         specifier: ^0.1.155
         version: 0.1.155(@types/markdown-it@14.1.2)
@@ -3229,6 +3232,9 @@ packages:
   zenn-content-css@0.1.155:
     resolution: {integrity: sha512-YR22ASOK/R86zPBr7fGSmuAO4urPSaAIzo0n1ZXt9MTsv5XRQuXMKWoqgvpTxE+kTrMnAREORH6IBKoy9ZOgUQ==}
 
+  zenn-embed-elements@0.1.158:
+    resolution: {integrity: sha512-g4tyRjV+v8j1Eq79IpE5//kcGCbM++QkXzayMdnVHsGoBVLH/PLS5cgnWmVq249hh99pCzSjAjbrg2Bwm8Iu1w==}
+
   zenn-markdown-html@0.1.155:
     resolution: {integrity: sha512-VfGsyvks9fiV4SIun5bfyBtaiIC6/5wrsPMTSkVnxF6BAbcnAUF4KnwBuR+kBbYv2YXr6Q7HP4OxvWLjHmbT7g==}
 
@@ -5227,7 +5233,7 @@ snapshots:
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@8.57.0)
       eslint-plugin-react: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.0)
@@ -5251,7 +5257,7 @@ snapshots:
       enhanced-resolve: 5.17.1
       eslint: 8.57.0
       eslint-module-utils: 2.8.2(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.6
       is-core-module: 2.15.1
@@ -5273,7 +5279,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0):
+  eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5
@@ -7034,6 +7040,8 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zenn-content-css@0.1.155: {}
+
+  zenn-embed-elements@0.1.158: {}
 
   zenn-markdown-html@0.1.155(@types/markdown-it@14.1.2):
     dependencies:
