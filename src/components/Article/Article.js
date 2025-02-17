@@ -150,7 +150,7 @@ function ArticleContent({ markdown, card, problem, frontMatter, articleSlug, boo
                                 container.appendChild(tooltip);
                                 setTimeout(() => {
                                     tooltip.remove();
-                                }, 2500);
+                                }, 1500);
                             })
                             .catch((err) => {
                                 console.error("コピーに失敗しました: ", err);
