@@ -134,7 +134,11 @@ function ArticleContent({ markdown, card, problem, frontMatter, articleSlug, boo
                 btn.addEventListener("click", () => {
                     const codeEl = container.querySelector("pre code");
                     if (codeEl) {
-                        const codeText = codeEl.innerText;
+                        let codeText = codeEl.innerText;
+                        // 最後に余計な改行がある場合は削除
+                        if (codeText.endsWith("\n")) {
+                            codeText = codeText.slice(0, -1);
+                        }
                         navigator.clipboard
                             .writeText(codeText)
                             .then(() => {
