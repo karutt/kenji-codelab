@@ -1,8 +1,8 @@
 {
-  "title": "P5.js  Beginner's Course",
-  "subTitle": "P5.jsでプログラミング入門",
+  "title": "P5.js Beginner's Course",
+  "subTitle": "Introduction to JavaScript",
   "category": "javascript / p5.js",
-  "description": "A comprehensive introduction to p5.js",
+  "description": "An introductory course to learn basic programming using p5.js, including drawing shapes, animations, and basic syntax.",
   "estimatedTime": "5 hours",
   "bookList": [
     [
@@ -25,8 +25,9 @@
     [
       "Programming Syntax",
       "§3.1 - if Statements (Conditional Branching)",
-      "§3.2 - for Loop (Repetition Processing)"
+      "§3.2 - for Loop (Repetition Processing)",
+      "§3.3 - User Events"
     ]
   ],
-  "articleCount": 16
+  "articleCount": 17
 }

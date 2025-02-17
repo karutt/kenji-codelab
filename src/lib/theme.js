@@ -16,6 +16,7 @@ export const theme = {
         white5: "rgba(255, 255, 255, 0.8)",
         gray: "#c0c0c0",
         portgore: "#1B1F3B",
+        abbey: "#495057",
         blue: "#3755BE",
         shark: "#212529",
         abbey: "#495057",

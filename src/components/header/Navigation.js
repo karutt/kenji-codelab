@@ -1,12 +1,12 @@
 "use client";
 import { Box } from "@/styles";
-import HeaderBox from "./HeaderBox";
 import Link from "next/link";
+import HeaderBox from "./HeaderBox";
 
 export default function Navigation({ pathname }) {
     const links = [
         { name: "Home", url: "/" },
-        { name: "Lessons", url: "/books/p5_tutorial" },
+        { name: "Lessons", url: "/books/" },
         { name: "Submit", url: "/submit" },
     ];
 

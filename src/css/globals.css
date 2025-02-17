@@ -21,3 +21,16 @@ a:hover {
 .editor textarea {
     padding: 24px !important;
 }
+
+.link {
+    text-decoration: none !important;
+    display: block;
+    height: 100%;
+}
+.link:hover {
+    opacity: 1 !important;
+}
+
+img {
+    border: solid 4px #f3f5fb;
+}

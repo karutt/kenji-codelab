@@ -1,0 +1,20 @@
+{
+  "title": "Canvaを使ったスライド作成入門",
+  "subTitle": "スライド作成入門",
+  "category": "application / Canva",
+  "description": "Canvaを使ってスライドを作成する方法を学ぶ入門講座",
+  "estimatedTime": "1 hours",
+  "bookList": [
+    [
+      "§1.0 スライドを作成する",
+      "§1.1 テキストを配置する",
+      "§1.2 テキストのサイズとフォント"
+    ],
+    [
+      "§2.0 レイアウト",
+      "§2.1 位置を揃える",
+      "§2.2 等間隔に配置する"
+    ]
+  ],
+  "articleCount": 6
+}

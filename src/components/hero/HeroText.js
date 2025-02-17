@@ -1,7 +1,6 @@
 // src/components/hero/HeroText.js
-import React from "react";
+import { BlackBtn, WhiteBtn } from "@/components/common/Btn";
 import { Box } from "@/styles";
-import { WhiteBtn, BlackBtn } from "@/components/common/Btn";
 import Link from "next/link";
 
 const HeroText = () => {
@@ -24,7 +23,7 @@ const HeroText = () => {
                 CodeLabは、東京賢治シュタイナー学校の、プログラミング教育のための学内プラットフォームです。
             </Box>
             <Box display='flex' gap={32}>
-                <Link href='books/p5_tutorial' style={{ textDecoration: "none" }}>
+                <Link href='books/' style={{ textDecoration: "none" }}>
                     <WhiteBtn>レッスンを始める</WhiteBtn>
                 </Link>
                 <Link href='/submit' style={{ textDecoration: "none" }}>
