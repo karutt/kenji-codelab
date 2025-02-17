@@ -1,20 +1,19 @@
 // components/Article.js
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation"; // 追加
-import markdownHtml from "zenn-markdown-html";
-import "zenn-content-css";
-import { Box } from "@/styles";
-import { ArticleCard } from "@/components/common/Card";
-import ArticleHead from "./ArticleHead";
 import CardSet from "@/components/CardSet/CardSet";
 import ProblemSet from "@/components/ProblemSet/ProblemSet";
-import { ToggleBtn } from "@/components/common/Btn";
-import Modal from "@/components/common/Modal";
 import { useSideMenu } from "@/components/SideMenu/SideMenuContext";
+import { ToggleBtn } from "@/components/common/Btn";
+import { ArticleCard } from "@/components/common/Card";
 import { InputField } from "@/components/common/Input";
-import { Suspense } from "react"; // Suspenseをインポート
+import Modal from "@/components/common/Modal";
+import { Box } from "@/styles";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import "zenn-content-css";
+import markdownHtml from "zenn-markdown-html";
+import ArticleHead from "./ArticleHead";
 
 export default function Article(props) {
     return (
@@ -29,11 +28,11 @@ function ArticleContent({ markdown, card, problem, frontMatter, articleSlug, boo
     const [showCard, setShowCard] = useState(false);
     const [showProblem, setShowProblem] = useState(false);
     const { showSideMenu, setShowSideMenu } = useSideMenu();
-    const router = useRouter(); // useRouterの使用
-    const searchParams = useSearchParams(); // 現在のクエリパラメータを取得
-    const pathname = usePathname(); // 現在のパスを取得
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
 
-    // 初期レンダリングでURLクエリに基づいて状態を設定
+    // URLクエリに基づく初期状態の設定
     useEffect(() => {
         const view = searchParams.get("view");
         if (view === "card") {
@@ -45,10 +44,10 @@ function ArticleContent({ markdown, card, problem, frontMatter, articleSlug, boo
             setShowSideMenu(false);
         } else {
             setShowCard(false);
-            setShowProblem(false); // 初期状態に戻す
+            setShowProblem(false);
             setShowSideMenu(true);
         }
-    }, [searchParams, setShowSideMenu]); //
+    }, [searchParams, setShowSideMenu]);
 
     const toggleCardView = () => {
         if (showCard) {
@@ -93,10 +92,10 @@ function ArticleContent({ markdown, card, problem, frontMatter, articleSlug, boo
     const saveNameToLocalStorage = () => {
         if (name.trim()) {
             localStorage.setItem("kenji_name", name);
-            setIsModalOpen(false); // モーダルを閉じる
-            setShowProblem(true); // 問題画面を表示
-            setShowCard(false); // カードを非表示
-            router.push("?view=problem", { scroll: false }); // URLを更新
+            setIsModalOpen(false);
+            setShowProblem(true);
+            setShowCard(false);
+            router.push("?view=problem", { scroll: false });
             setShowSideMenu(false);
         } else {
             alert("名前を入力してください！");
@@ -105,6 +104,60 @@ function ArticleContent({ markdown, card, problem, frontMatter, articleSlug, boo
 
     const showCardBtn = Boolean(card);
     const showProblemBtn = Boolean(problem);
+
+    // Option2: DOM 操作で各コードブロックにコピー用ボタンを追加する
+    useEffect(() => {
+        // 生成された HTML 内の .code-block-container 要素を全て取得
+        const containers = document.querySelectorAll(".code-block-container");
+        containers.forEach((container) => {
+            // 既にボタンが存在していればスキップ
+            if (!container.querySelector(".copy-button")) {
+                // コンテナに relative スタイルを設定（ボタンの絶対配置用）
+                container.style.position = "relative";
+
+                // コピー用ボタンを作成
+                const btn = document.createElement("button");
+                btn.className = "copy-button";
+                // 初期状態はコピーアイコン（以下は inline SVG の例。global.css でスタイル調整推奨）
+                btn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 1H4C2.89543 1 2 1.89543 2 3V17H4V3H16V1Z"/>
+            <path d="M19 5H8C6.89543 5 6 5.89543 6 7V21C6 22.1046 6.89543 23 8 23H19C20.1046 23 21 22.1046 21 21V7C21 5.89543 20.1046 5 19 5ZM19 21H8V7H19V21Z"/>
+          </svg>
+        `;
+                // ボタンの位置調整用スタイル（基本的な位置設定。詳細は global.css で上書き可能）
+                btn.style.position = "absolute";
+                btn.style.top = "10px";
+                btn.style.right = "10px";
+                btn.style.cursor = "pointer";
+                // クリックイベントでコピー処理とツールチップの表示を実装
+                btn.addEventListener("click", () => {
+                    const codeEl = container.querySelector("pre code");
+                    if (codeEl) {
+                        const codeText = codeEl.innerText;
+                        navigator.clipboard
+                            .writeText(codeText)
+                            .then(() => {
+                                // ツールチップ用要素を作成
+                                const tooltip = document.createElement("div");
+                                tooltip.className = "copy-tooltip";
+                                tooltip.textContent = "コピーしました！";
+
+                                container.appendChild(tooltip);
+                                setTimeout(() => {
+                                    tooltip.remove();
+                                }, 2500);
+                            })
+                            .catch((err) => {
+                                console.error("コピーに失敗しました: ", err);
+                            });
+                    }
+                });
+                // ボタンをコンテナの先頭に挿入
+                container.insertBefore(btn, container.firstChild);
+            }
+        });
+    }, [article_html]);
 
     return (
         <Box as='article' className='znc' color='shark' my={32} width='100%' maxWidth={860}>
