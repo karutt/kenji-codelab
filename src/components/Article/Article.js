@@ -9,11 +9,42 @@ import { ArticleCard } from "@/components/common/Card";
 import { InputField } from "@/components/common/Input";
 import Modal from "@/components/common/Modal";
 import { Box } from "@/styles";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import "zenn-content-css";
 import markdownHtml from "zenn-markdown-html";
 import ArticleHead from "./ArticleHead";
+
+function useKenjiName(router, setShowProblem, setShowCard, setShowSideMenu) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [name, setName] = useState("");
+
+    useEffect(() => {
+        const savedName = localStorage.getItem("kenji_name");
+        if (savedName) setName(savedName);
+    }, []);
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+    const saveNameToLocalStorage = () => {
+        if (name.trim()) {
+            localStorage.setItem("kenji_name", name);
+            setIsModalOpen(false);
+            setShowProblem(true);
+            setShowCard(false);
+            router.push("?view=problem", { scroll: false });
+            setShowSideMenu(false);
+        } else {
+            alert("名前を入力してください！");
+        }
+    };
+    return { name, setName, isModalOpen, openModal, closeModal, saveNameToLocalStorage };
+}
 
 export default function Article(props) {
     return (
@@ -23,7 +54,15 @@ export default function Article(props) {
     );
 }
 
-function ArticleContent({ markdown, card, problem, frontMatter, articleSlug, bookSlug }) {
+function ArticleContent({
+    markdown,
+    card,
+    problem,
+    frontMatter,
+    articleSlug,
+    bookSlug,
+    neighborsPage,
+}) {
     const article_html = markdownHtml(markdown);
     const [showCard, setShowCard] = useState(false);
     const [showProblem, setShowProblem] = useState(false);
@@ -61,49 +100,52 @@ function ArticleContent({ markdown, card, problem, frontMatter, articleSlug, boo
         }
     };
 
+    const { name, setName, isModalOpen, openModal, closeModal, saveNameToLocalStorage } =
+        useKenjiName(router, setShowProblem, setShowCard, setShowSideMenu);
+
     const toggleProblemView = () => {
         if (showProblem) {
             setShowProblem(false);
             setShowSideMenu(true);
             router.back();
-            return;
-        }
-        setIsModalOpen(true); // まずはモーダルを開く
-    };
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [name, setName] = useState("");
-
-    useEffect(() => {
-        const savedName = localStorage.getItem("kenji_name");
-        if (savedName) {
-            setName(savedName);
-        }
-    }, []);
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
-
-    const handleNameChange = (e) => {
-        setName(e.target.value);
-    };
-
-    const saveNameToLocalStorage = () => {
-        if (name.trim()) {
-            localStorage.setItem("kenji_name", name);
-            setIsModalOpen(false);
-            setShowProblem(true);
-            setShowCard(false);
-            router.push("?view=problem", { scroll: false });
-            setShowSideMenu(false);
         } else {
-            alert("名前を入力してください！");
+            openModal();
         }
     };
 
     const showCardBtn = Boolean(card);
     const showProblemBtn = Boolean(problem);
+
+    function NeighborLinkCard({ link, title, next }) {
+        return (
+            <Box flex={1} maxWidth={["100%", 360]}>
+                <Link href={`${link}`} passHref>
+                    <Box
+                        display='flex'
+                        alignItems='center'
+                        justifyContent={next ? "space-between" : "flex-start"}
+                        flexDirection={next ? "row-reverse" : "row"}
+                        py={16}
+                        px={24}
+                        border='solid 1px #e9ecef'
+                        borderRadius={8}
+                        style={{ cursor: "pointer" }}
+                        gap={12}
+                        bg='white'>
+                        <Box as='span'>{next ? "→" : "←"}</Box>
+                        <Box fontSize={16}>
+                            <Box color='hitGray' mb={-4}>
+                                {next ? "Next" : "Prev"}
+                            </Box>
+                            <Box color='shark' fontWeight='bold'>
+                                {title}
+                            </Box>
+                        </Box>
+                    </Box>
+                </Link>
+            </Box>
+        );
+    }
 
     // Option2: DOM 操作で各コードブロックにコピー用ボタンを追加する
     useEffect(() => {
@@ -204,7 +246,7 @@ function ArticleContent({ markdown, card, problem, frontMatter, articleSlug, boo
                 <InputField
                     type='text'
                     value={name}
-                    onChange={handleNameChange}
+                    onChange={(e) => setName(e.target.value)}
                     placeholder='名前を入力'
                 />
                 <Box
@@ -231,6 +273,27 @@ function ArticleContent({ markdown, card, problem, frontMatter, articleSlug, boo
                     キャンセル
                 </Box>
             </Modal>
+
+            <Box
+                mt={24}
+                display='flex'
+                justifyContent='space-between'
+                flexDirection={["column", "row"]}
+                gap={8}>
+                {neighborsPage?.prePage && (
+                    <NeighborLinkCard
+                        link={neighborsPage.prePage.link}
+                        title={neighborsPage.prePage.title}
+                    />
+                )}
+                {neighborsPage?.nextPage && (
+                    <NeighborLinkCard
+                        link={neighborsPage.nextPage.link}
+                        title={neighborsPage.nextPage.title}
+                        next
+                    />
+                )}
+            </Box>
         </Box>
     );
 }

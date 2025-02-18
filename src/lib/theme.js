@@ -19,7 +19,6 @@ export const theme = {
         abbey: "#495057",
         blue: "#3755BE",
         shark: "#212529",
-        abbey: "#495057",
         lilac: "#F3F5FB",
         hitGray: "#ADB5BD",
         blue75: "rgba(55, 85, 190, 0.75)",

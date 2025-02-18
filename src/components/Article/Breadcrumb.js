@@ -16,7 +16,7 @@ export default function Breadcrumb({ bookName, chapter }) {
                 justifyContent='center'>
                 <Box fontSize={14}>{bookName}</Box>
                 <Icon name='triangle' />
-                <Box fontSize={14}>Capter{chapter.split("-")[0]}</Box>
+                <Box fontSize={14}>Chapter {chapter.split("-")[0]}</Box>
             </Box>
         </Box>
     );
