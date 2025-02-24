@@ -1,6 +1,6 @@
+import { ProbBtn } from "@/components/common/Btn";
 import { Box, Icon } from "@/styles";
 import Breadcrumb from "./Breadcrumb";
-import { ProbBtn } from "@/components/common/Btn";
 
 export default function ArticleHead({
     frontMatter,
