@@ -7,7 +7,6 @@ export default function Navigation({ pathname }) {
     const links = [
         { name: "Home", url: "/" },
         { name: "Lessons", url: "/books/" },
-        { name: "Submit", url: "/submit" },
     ];
 
     return (

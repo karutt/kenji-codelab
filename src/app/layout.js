@@ -8,8 +8,8 @@ const notosansjp = Noto_Sans_JP({
     weight: ["300", "400", "500", "700"], // 400: normal, 500: semibold, 700: bold
 });
 
-import Header from "@/components/header/Header";
-import Footer from "@/components/Footer/Footer";
+import Header from "@/components/common/header/Header";
+import Footer from "@/components/common/Footer/Footer";
 
 export const metadata = {
     title: "KeNJi CodeLab",
