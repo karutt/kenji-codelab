@@ -13,8 +13,7 @@ export default function SideMenuBody({ config, bookName, articleSlug }) {
                 return (
                     <Box mb={12} key={index}>
                         <Box>
-                            <Box fontSize={14} mb={
-                                2}>
+                            <Box fontSize={14} mb={2}>
                                 Chapter {index + 1}
                             </Box>
 

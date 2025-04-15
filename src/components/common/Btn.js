@@ -1,6 +1,6 @@
 import { Box, Icon } from "@/styles";
 import styled from "styled-components";
-import { space, layout, typography } from "styled-system";
+import { layout, space, typography } from "styled-system";
 
 const Btn = styled.div`
     display: flex;
@@ -105,7 +105,7 @@ export function ProbBtn({ toggle, onClick }) {
             borderRadius='100px'
             letterSpacing='0.05em'
             fontSize='14px'
-            zIndex={1000}
+            zIndex={20}
             style={{ cursor: "pointer", opacity: 0.9 }}>
             {toggle ? "記事に戻る" : "問題を解く"}
         </Box>

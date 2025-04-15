@@ -1,8 +1,8 @@
 "use client";
 import { Box, Icon } from "@/styles";
 import Link from "next/link";
-import Navigation from "./Navigation";
 import { usePathname } from "next/navigation";
+import Navigation from "./Navigation";
 
 export default function Header() {
     const pathname = usePathname();
@@ -11,13 +11,13 @@ export default function Header() {
     // パスを分割してセグメントを取得
     const pathSegments = pathname.split("/").filter(Boolean);
 
-    // `pathname` の長さとセグメント名で記事ページかどうかを判定
-    const isArticlePage = pathSegments.length === 3 && /^[0-9]+-[0-9]+$/.test(pathSegments[2]);
+    // // `pathname` の長さとセグメント名で記事ページかどうかを判定
+    // const isArticlePage = pathSegments.length === 3 && /^[0-9]+-[0-9]+$/.test(pathSegments[2]);
 
-    // 記事ページの場合はヘッダーを非表示
-    if (isArticlePage) {
-        return null;
-    }
+    // // 記事ページの場合はヘッダーを非表示
+    // if (isArticlePage) {
+    //     return null;
+    // }
 
     return (
         <Box
@@ -30,7 +30,7 @@ export default function Header() {
             left={0}
             width='100vw'
             borderBottom='1px solid rgba(255, 255, 255, 0.2)'
-            zIndex={2}>
+            zIndex={100}>
             <Box
                 display='flex'
                 alignItems='center'
@@ -39,7 +39,7 @@ export default function Header() {
                 height='100%'
                 maxWidth={1140}>
                 <Link href='/'>
-                    <Icon name='logo_text' width={240} height='100%' />
+                    <Icon name='logo_text' width={180} height='100%' />
                 </Link>
                 <Navigation pathname={pathname} />
             </Box>

@@ -18,7 +18,7 @@ const Card = styled(Box)`
 const SideMenuCard = styled(Card)`
     position: sticky;
     padding: 0;
-    top: 32px;
+    top: 64px;
     height: calc(100vh - 64px);
     overflow: auto;
     padding-bottom: 120px;
@@ -46,4 +46,4 @@ const ArticleCard = styled(Card)`
     padding-bottom: 32px;
 `;
 
-export { Card, SideMenuCard, ArticleCard, SideMenuHeadCard };
+export { ArticleCard, Card, SideMenuCard, SideMenuHeadCard };

@@ -17,6 +17,7 @@ export default function Layout({ children, params }) {
                     justifyContent: "center",
                     alignItems: "stretch",
                     background: "#EDF2F6",
+                    marginTop: "64px",
                 }}>
                 {/* SideMenuはContextの状態に基づいて表示・非表示を切り替える */}
                 <SideMenu config={config} bookName={bookSlug} articleSlug={articleSlug} />

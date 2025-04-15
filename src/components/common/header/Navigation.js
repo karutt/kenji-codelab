@@ -21,7 +21,18 @@ export default function Navigation({ pathname }) {
                     (pathname.endsWith("_en") ? (
                         <Link href={pathname.replace("_en", "")}>Ja</Link>
                     ) : (
-                        <Link href={`${pathname}_en`}>En</Link>
+                        (() => {
+                            const splitted = pathname.split("/");
+                            if (splitted[1] === "books" && splitted[2]) {
+                                // すでに_enがついていれば外す
+                                if (splitted[2].endsWith("_en")) {
+                                    splitted[2] = splitted[2].replace(/_en$/, "");
+                                } else {
+                                    splitted[2] += "_en";
+                                }
+                            }
+                            return <Link href={splitted.join("/")}>En</Link>;
+                        })()
                     ))}
             </Box>
         </Box>
