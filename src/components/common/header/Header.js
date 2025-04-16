@@ -2,6 +2,7 @@
 import { Box, Icon } from "@/styles";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import Navigation from "./Navigation";
 
 export default function Header() {
@@ -11,13 +12,34 @@ export default function Header() {
     // パスを分割してセグメントを取得
     const pathSegments = pathname.split("/").filter(Boolean);
 
-    // // `pathname` の長さとセグメント名で記事ページかどうかを判定
-    // const isArticlePage = pathSegments.length === 3 && /^[0-9]+-[0-9]+$/.test(pathSegments[2]);
+    // スクロールでヘッダーを隠す/表示する
+    const [showHeader, setShowHeader] = useState(true);
+    const lastScrollY = useRef(0);
+    const scrollDelta = useRef(0);
+    const HIDE_THRESHOLD = 120; // これだけ連続で下スクロールしたら隠す
 
-    // // 記事ページの場合はヘッダーを非表示
-    // if (isArticlePage) {
-    //     return null;
-    // }
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentY = window.scrollY;
+            if (currentY < 128) {
+                setShowHeader(true);
+                scrollDelta.current = 0;
+            } else if (currentY > lastScrollY.current) {
+                // 下スクロール
+                scrollDelta.current += currentY - lastScrollY.current;
+                if (scrollDelta.current > HIDE_THRESHOLD) {
+                    setShowHeader(false);
+                }
+            } else {
+                // 上スクロール
+                setShowHeader(true);
+                scrollDelta.current = 0;
+            }
+            lastScrollY.current = currentY;
+        };
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
         <Box
@@ -30,7 +52,11 @@ export default function Header() {
             left={0}
             width='100vw'
             borderBottom='1px solid rgba(255, 255, 255, 0.2)'
-            zIndex={100}>
+            zIndex={100}
+            style={{
+                transition: "transform 0.3s cubic-bezier(.4,0,.2,1)",
+                transform: showHeader ? "translateY(0)" : "translateY(-100%)",
+            }}>
             <Box
                 display='flex'
                 alignItems='center'
