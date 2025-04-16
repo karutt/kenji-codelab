@@ -1,7 +1,7 @@
 import { Noto_Sans_JP } from "next/font/google";
 import "@/css/globals.css";
 import "@/css/normalize.css";
-import StyledComponentsRegistry from "../lib/registry";
+import StyledComponentsRegistry from "../utils/registry";
 
 const notosansjp = Noto_Sans_JP({
     subsets: ["latin"],
