@@ -7,7 +7,8 @@ import Navigation from "./Navigation";
 
 export default function Header() {
     const pathname = usePathname();
-    const isRoot = pathname === "/";
+    // ルートパスか、もしくは"/chat"で始まるパスの場合は透明にする
+    const isTransparent = pathname === "/" || pathname.startsWith("/chat");
 
     // パスを分割してセグメントを取得
     const pathSegments = pathname.split("/").filter(Boolean);
@@ -44,7 +45,7 @@ export default function Header() {
     return (
         <Box
             as='header'
-            bg={isRoot ? "none" : "portgore"}
+            bg={isTransparent ? "none" : "portgore"}
             color='white'
             height={64}
             position='fixed'

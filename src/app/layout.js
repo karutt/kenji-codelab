@@ -1,6 +1,7 @@
-import { Noto_Sans_JP } from "next/font/google";
 import "@/css/globals.css";
 import "@/css/normalize.css";
+import { ThemeProvider } from "next-themes";
+import { Noto_Sans_JP } from "next/font/google";
 import StyledComponentsRegistry from "../utils/registry";
 
 const notosansjp = Noto_Sans_JP({
@@ -8,8 +9,8 @@ const notosansjp = Noto_Sans_JP({
     weight: ["300", "400", "500", "700"], // 400: normal, 500: semibold, 700: bold
 });
 
-import Header from "@/components/common/header/Header";
 import Footer from "@/components/common/Footer/Footer";
+import Header from "@/components/common/header/Header";
 
 export const metadata = {
     title: "KeNJi CodeLab",
@@ -26,12 +27,13 @@ export default function RootLayout({ children }) {
     return (
         <html lang='ja'>
             <body className={notosansjp.className}>
-                <StyledComponentsRegistry>
-                    <Header />
-                    {children}
-
-                    <Footer />
-                </StyledComponentsRegistry>
+                <ThemeProvider attribute='class' defaultTheme='light' enableSystem={false}>
+                    <StyledComponentsRegistry>
+                        <Header />
+                        {children}
+                        <Footer />
+                    </StyledComponentsRegistry>
+                </ThemeProvider>
             </body>
         </html>
     );
