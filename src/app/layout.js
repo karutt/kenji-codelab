@@ -1,3 +1,5 @@
+import { Provider } from "@/components/ui/provider";
+import { AuthProvider } from "@/contexts/AuthContext";
 import "@/css/globals.css";
 import "@/css/normalize.css";
 import { ThemeProvider } from "next-themes";
@@ -28,11 +30,15 @@ export default function RootLayout({ children }) {
         <html lang='ja'>
             <body className={notosansjp.className}>
                 <ThemeProvider attribute='class' defaultTheme='light' enableSystem={false}>
-                    <StyledComponentsRegistry>
-                        <Header />
-                        {children}
-                        <Footer />
-                    </StyledComponentsRegistry>
+                    <Provider>
+                        <StyledComponentsRegistry>
+                            <AuthProvider>
+                                <Header />
+                                {children}
+                                <Footer />
+                            </AuthProvider>
+                        </StyledComponentsRegistry>
+                    </Provider>
                 </ThemeProvider>
             </body>
         </html>

@@ -24,6 +24,11 @@ const config = defineConfig({
                     green: { value: "#28a745" },
                 },
             },
+            fonts: {
+                body: "",
+                heading: "",
+                fontWeights: { value: "500" },
+            },
         },
     },
 });

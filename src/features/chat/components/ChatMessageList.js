@@ -1,6 +1,7 @@
 // src/features/chat/components/ChatMessageList.js
 "use client";
 import { useChatUsers } from "@/features/user/hooks/useChatUsers";
+
 import { Avatar, Box, Spinner, Stack, Text } from "@chakra-ui/react";
 import React from "react";
 import { Virtuoso } from "react-virtuoso";
@@ -29,7 +30,7 @@ const ChatMessageList = ({ messages, virtuosoRef, onLoadOlder, loadingOlder }) =
     }, [onLoadOlder]);
 
     return (
-        <Box flex={1} w='100%'>
+        <Box flex={1} w='100%' h='100%'>
             <Virtuoso
                 followOutput={true}
                 data={messages}

@@ -1,5 +1,7 @@
 "use client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Box, Icon } from "@/styles";
+import { Avatar } from "@chakra-ui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -7,6 +9,8 @@ import Navigation from "./Navigation";
 
 export default function Header() {
     const pathname = usePathname();
+    const { user, loading } = useAuth();
+    console.log("Header", pathname, user, loading);
     // ルートパスか、もしくは"/chat"で始まるパスの場合は透明にする
     const isTransparent = pathname === "/" || pathname.startsWith("/chat");
 
@@ -68,7 +72,25 @@ export default function Header() {
                 <Link href='/'>
                     <Icon name='logo_text' width={180} height='100%' />
                 </Link>
-                <Navigation pathname={pathname} />
+                <Navigation pathname={pathname} user={user} loading={loading} />
+                {/* ログイン状態によって表示を切り替え */}
+                <Box ml={24} display='flex' alignItems='center'>
+                    {!user && (
+                        <Link
+                            href='/login'
+                            style={{ color: "white", opacity: 0.85, fontWeight: 500 }}>
+                            ログイン
+                        </Link>
+                    )}
+                    {user && (
+                        <Link href='/profile' passHref>
+                            <Avatar.Root colorPalette='cyan' size='xs'>
+                                {user.displayName && <Avatar.Fallback name={user.displayName} />}
+                                {user.photoURL && <Avatar.Image src={user.photoURL} />}
+                            </Avatar.Root>
+                        </Link>
+                    )}
+                </Box>
             </Box>
         </Box>
     );

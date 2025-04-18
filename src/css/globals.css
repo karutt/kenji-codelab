@@ -1,5 +1,7 @@
 body {
     background-color: #f3f5fb !important;
+    color: black;
+    -webkit-font-smoothing: subpixel-antialiased !important;
 }
 
 a {
@@ -14,9 +16,17 @@ a:hover {
 
 .znc .main {
     font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans",
-        Meiryo, sans-serif, "Segoe UI Emoji";
+        Meiryo, sans-serif, "Segoe UI Emoji" !important;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 600;
+}
 .editor pre,
 .editor textarea {
     padding: 24px !important;
