@@ -61,22 +61,29 @@ const LessonCard = ({ config }) => {
         <Box flex={1} maxWidth={320} m={0}>
             <Link href={path} passHref width='100%' className='link'>
                 <Card textAlign='center' width='100%' height={"100%"} p={32}>
-                    <Icon name={config["slug"] + "_thumnail"} width={100} height={100} />
                     <Box
-                        color='abbey'
                         display='flex'
                         alignItems='center'
                         justifyContent='center'
                         flexDirection='column'
-                        gap={12}>
-                        <Box fontSize={24} fontWeight='bold'>
-                            {config["subTitle"]}
-                        </Box>
-                        <Box fontSize={14} fontWeight='normal' lineHeight={1.7}>
-                            {config["description"]}
-                        </Box>
-                        <Box fontSize={14} fontWeight='bold' lineHeight={1.7} color='hitGray'>
-                            記事数{config["articleCount"]}　{config["estimatedTime"]}
+                        gap={16}>
+                        <Icon name={config["slug"] + "_thumnail"} width={100} height={100} />
+                        <Box
+                            color='abbey'
+                            display='flex'
+                            alignItems='center'
+                            justifyContent='center'
+                            flexDirection='column'
+                            gap={12}>
+                            <Box fontSize={24} fontWeight='bold'>
+                                {config["subTitle"]}
+                            </Box>
+                            <Box fontSize={14} fontWeight='normal' lineHeight={1.7}>
+                                {config["description"]}
+                            </Box>
+                            <Box fontSize={14} fontWeight='bold' lineHeight={1.7} color='hitGray'>
+                                記事数{config["articleCount"]}　{config["estimatedTime"]}
+                            </Box>
                         </Box>
                     </Box>
                 </Card>

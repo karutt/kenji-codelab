@@ -1,5 +1,4 @@
 "use client";
-import { useAuth } from "@/contexts/AuthContext";
 import { auth } from "@/utils/firebase";
 import { Box, Button, Field, Fieldset, Heading, Input, Stack } from "@chakra-ui/react";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -7,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginPage() {
-    const { user, loading } = useAuth();
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

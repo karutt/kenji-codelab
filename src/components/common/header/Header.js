@@ -75,14 +75,14 @@ export default function Header() {
                 <Navigation pathname={pathname} user={user} loading={loading} />
                 {/* ログイン状態によって表示を切り替え */}
                 <Box ml={24} display='flex' alignItems='center'>
-                    {!user && (
+                    {!loading && !user && (
                         <Link
                             href='/login'
                             style={{ color: "white", opacity: 0.85, fontWeight: 500 }}>
                             ログイン
                         </Link>
                     )}
-                    {user && (
+                    {!loading && user && (
                         <Link href='/profile' passHref>
                             <Avatar.Root colorPalette='cyan' size='xs'>
                                 {user.displayName && <Avatar.Fallback name={user.displayName} />}

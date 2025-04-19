@@ -1,7 +1,14 @@
 "use client";
 import { Box, Icon } from "@/styles";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 export default function Footer() {
+    const pathname = usePathname();
+    if (pathname && pathname.startsWith("/chat")) {
+        return null;
+    }
+
     const links = [
         { name: "Home", url: "/" },
         { name: "Lessons", url: "/books/p5_tutorial" },
