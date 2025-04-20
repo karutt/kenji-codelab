@@ -1,12 +1,10 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { login } from "../api/auth";
 
 export function useLogin() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const router = useRouter();
 
     const doLogin = async (email, password) => {
         setError("");
@@ -14,7 +12,7 @@ export function useLogin() {
         try {
             await login({ email, password });
             await new Promise((res) => setTimeout(res, 50)); // ←⏸ ほんの少し待つ
-            router.replace("/");
+            window.location.replace("/");
         } catch {
             setError("メールアドレスまたはパスワードが正しくありません。");
         } finally {
