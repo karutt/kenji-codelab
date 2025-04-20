@@ -1,17 +1,17 @@
 "use client";
 
-import Editor from "react-simple-code-editor";
 import hljs from "highlight.js/lib/core";
 import javascript from "highlight.js/lib/languages/javascript";
 import "highlight.js/styles/github-dark-dimmed.css";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Editor from "react-simple-code-editor";
 import "zenn-content-css";
 
-import markdownHtml from "zenn-markdown-html";
-import "zenn-content-css";
-import { parseProblemContent } from "./utils";
+import { BlueBtn, ProbBtn2 } from "@/components/common/Btn";
 import { addCodeToNotion } from "@/components/notion/actions"; // Server Actionをインポート
-import { ProbBtn2, BlueBtn } from "@/components/common/Btn";
+import "zenn-content-css";
+import markdownHtml from "zenn-markdown-html";
+import { parseProblemContent } from "./utils";
 
 function ProblemSet({ problemMarkdown, articleSlug, bookSlug, onClick, showProblem }) {
     hljs.registerLanguage("javascript", javascript);
@@ -25,7 +25,7 @@ function ProblemSet({ problemMarkdown, articleSlug, bookSlug, onClick, showProbl
     console.log(doc);
 
     // 問題文を取得（<h1>要素が各問題のタイトル）
-    const problemHeaders = Array.from(doc.querySelectorAll("h1"));
+    const problemHeaders = useMemo(() => Array.from(doc.querySelectorAll("h1")), [doc]);
 
     // 状態管理：ユーザーが入力したコードの状態を管理
     const [submittedCodes, setSubmittedCodes] = useState(Array(problemHeaders.length).fill(""));
@@ -68,13 +68,20 @@ function ProblemSet({ problemMarkdown, articleSlug, bookSlug, onClick, showProbl
     };
 
     useEffect(() => {
-        const updatedCodes = [...submittedCodes];
-        problemHeaders.forEach((header, index) => {
-            const { _, defaultCode } = parseProblemContent(header);
-            updatedCodes[index] = defaultCode;
-            setSubmittedCodes(updatedCodes);
+        // 既存のコード入力を保持しつつ、問題数が変わった場合のみ初期化
+        setSubmittedCodes((prev) => {
+            const updated = [...prev];
+            for (let i = 0; i < problemHeaders.length; i++) {
+                const { _, defaultCode } = parseProblemContent(problemHeaders[i]);
+                if (typeof updated[i] === "undefined") {
+                    updated[i] = defaultCode;
+                }
+            }
+            // 問題数が減った場合に余分な要素を削除
+            return updated.slice(0, problemHeaders.length);
         });
-    }, []);
+    }, [problemHeaders.length]);
+
     useEffect(() => {
         import("zenn-embed-elements");
     }, []);

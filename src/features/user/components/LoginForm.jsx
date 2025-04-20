@@ -68,7 +68,7 @@ export default function LoginForm() {
                 </Button>
                 <Separator />
                 <Text textAlign='center'>
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <Link href='/signup'>
                         <Highlight styles={{ color: "brand.blue" }} query='Sign Up'>
                             Sign Up
