@@ -10,6 +10,7 @@ import {
 const setSessionCookie = async (idToken) => {
     await fetch("/api/session", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
     });
@@ -34,7 +35,7 @@ export const login = async ({ email, password }) => {
 
 export const logout = async () => {
     // セッション Cookie を削除
-    await fetch("/api/session", { method: "DELETE" });
+    await fetch("/api/session", { method: "DELETE", credentials: "include" });
     // Firebase のクライアントもサインアウト
     return firebaseSignOut(auth);
 };

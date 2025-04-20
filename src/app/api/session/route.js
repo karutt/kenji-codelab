@@ -1,12 +1,14 @@
 // src/app/api/session/route.js
-export const runtime = "nodejs";
-
 import { authAdmin } from "@/utils/firebaseAdmin";
-import { serialize } from "cookie";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 const SESSION_COOKIE_NAME = "session";
 const MAX_AGE = 60 * 60 * 24 * 5;
+
+export const runtime = "nodejs";
+// この API ハンドラは絶対キャッシュさせない
+export const revalidate = 0;
 
 export async function POST(request) {
     const { idToken } = await request.json();
@@ -17,27 +19,20 @@ export async function POST(request) {
         expiresIn: MAX_AGE * 1000,
     });
     const res = NextResponse.json({ ok: true });
-    res.headers.append(
-        "Set-Cookie",
-        serialize(SESSION_COOKIE_NAME, sessionCookie, {
-            maxAge: MAX_AGE,
-            httpOnly: true,
-            path: "/",
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-        })
-    );
+    cookies().set({
+        name: SESSION_COOKIE_NAME,
+        value: sessionCookie,
+        httpOnly: true,
+        maxAge: MAX_AGE,
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+    });
     return res;
 }
 
 export async function DELETE() {
     const res = NextResponse.json({ ok: true });
-    res.headers.append(
-        "Set-Cookie",
-        serialize(SESSION_COOKIE_NAME, "", {
-            maxAge: -1,
-            path: "/",
-        })
-    );
+    cookies().delete(SESSION_COOKIE_NAME, { path: "/" });
     return res;
 }
