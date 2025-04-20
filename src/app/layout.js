@@ -2,10 +2,10 @@ import { Provider } from "@/components/ui/provider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import "@/css/globals.css";
 import "@/css/normalize.css";
+import AuthSync from "@/features/user/components/AuthSync";
 import { ThemeProvider } from "next-themes";
 import { Noto_Sans_JP } from "next/font/google";
 import StyledComponentsRegistry from "../utils/registry";
-import { AuthSync } from "./providers/AuthSync";
 const notosansjp = Noto_Sans_JP({
     subsets: ["latin"],
     weight: ["300", "400", "500", "700"], // 400: normal, 500: semibold, 700: bold

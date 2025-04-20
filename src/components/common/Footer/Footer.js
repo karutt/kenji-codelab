@@ -12,7 +12,6 @@ export default function Footer() {
     const links = [
         { name: "Home", url: "/" },
         { name: "Lessons", url: "/books/p5_tutorial" },
-        { name: "Submit", url: "/submit" },
     ];
     const contacts = [
         { iconName: "mail", value: "karutetto332@gmail.com", mail: 1 },

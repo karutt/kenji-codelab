@@ -26,8 +26,8 @@ const HeroText = () => {
                 <Link href='books/' style={{ textDecoration: "none" }}>
                     <WhiteBtn>レッスンを始める</WhiteBtn>
                 </Link>
-                <Link href='/submit' style={{ textDecoration: "none" }}>
-                    <BlackBtn>コードを提出</BlackBtn>
+                <Link href='/login' style={{ textDecoration: "none" }}>
+                    <BlackBtn>ログイン</BlackBtn>
                 </Link>
             </Box>
         </Box>

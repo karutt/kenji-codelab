@@ -8,12 +8,15 @@ import {
 } from "firebase/auth";
 
 const setSessionCookie = async (idToken) => {
-    await fetch("/api/session", {
+    const res = await fetch("/api/session", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
     });
+    if (!res.ok) {
+        console.error("session API error:", await res.text());
+    }
 };
 
 export const signup = async ({ email, password, displayName, photoURL }) => {
