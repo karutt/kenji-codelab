@@ -5,7 +5,7 @@ import "@/css/normalize.css";
 import { ThemeProvider } from "next-themes";
 import { Noto_Sans_JP } from "next/font/google";
 import StyledComponentsRegistry from "../utils/registry";
-
+import { AuthSync } from "./providers/AuthSync";
 const notosansjp = Noto_Sans_JP({
     subsets: ["latin"],
     weight: ["300", "400", "500", "700"], // 400: normal, 500: semibold, 700: bold
@@ -36,6 +36,7 @@ export default function RootLayout({ children }) {
                                 <Header />
                                 {children}
                                 <Footer />
+                                <AuthSync />
                             </AuthProvider>
                         </StyledComponentsRegistry>
                     </Provider>

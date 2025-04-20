@@ -1,4 +1,3 @@
-// src/features/user/hooks/useChatUsers.ts
 "use client";
 import { db } from "@/utils/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";

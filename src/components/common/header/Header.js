@@ -10,7 +10,6 @@ import Navigation from "./Navigation";
 export default function Header() {
     const pathname = usePathname();
     const { user, loading } = useAuth();
-    console.log("Header", pathname, user, loading);
     // ルートパスか、もしくは"/chat"で始まるパスの場合は透明にする
     const isTransparent = pathname === "/" || pathname.startsWith("/chat");
 
@@ -79,14 +78,16 @@ export default function Header() {
                         <Link
                             href='/login'
                             style={{ color: "white", opacity: 0.85, fontWeight: 500 }}>
-                            ログイン
+                            Sign in
                         </Link>
                     )}
                     {!loading && user && (
                         <Link href='/profile' passHref>
                             <Avatar.Root colorPalette='cyan' size='xs'>
                                 {user.displayName && <Avatar.Fallback name={user.displayName} />}
-                                {user.photoURL && <Avatar.Image src={user.photoURL} />}
+                                {user.photoURL && (
+                                    <Avatar.Image src={user.photoURL} borderWidth={1} />
+                                )}
                             </Avatar.Root>
                         </Link>
                     )}
