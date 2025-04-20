@@ -13,7 +13,7 @@ export function useLogin() {
         setLoading(true);
         try {
             await login({ email, password });
-            await new Promise((res) => setTimeout(res, 500)); // ←⏸ ほんの少し待つ
+            await new Promise((res) => setTimeout(res, 50)); // ←⏸ ほんの少し待つ
             router.replace("/");
         } catch {
             setError("メールアドレスまたはパスワードが正しくありません。");
