@@ -1,5 +1,4 @@
 "use client";
-import Bg from "@/components/common/bg";
 import ProfileForm from "@/features/user/components/ProfileForm";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { Box, Center } from "@chakra-ui/react";
@@ -11,11 +10,11 @@ export default function ProfilePage() {
     return (
         <>
             <Center minH='100vh' py={12} zIndex='2' position='relative'>
-                <Box w='full' maxW='md' p={8} bg='white' borderRadius='xl' boxShadow='lg'>
+                <Box w='full' maxW='md' p={8} bg='white' borderRadius='xl'>
                     <ProfileForm />
                 </Box>
             </Center>
-            <Bg />
+            {/* <Bg /> */}
         </>
     );
 }
