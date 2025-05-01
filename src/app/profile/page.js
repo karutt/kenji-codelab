@@ -10,7 +10,7 @@ export default function ProfilePage() {
     return (
         <>
             <Center minH='100vh' py={12} zIndex='2' position='relative'>
-                <Box w='full' maxW='md' p={8} bg='white' borderRadius='xl'>
+                <Box w='full' maxW='md' py={8} px={12} bg='white' borderRadius='xl'>
                     <ProfileForm />
                 </Box>
             </Center>
