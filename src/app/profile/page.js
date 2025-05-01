@@ -4,7 +4,6 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { Box, Center } from "@chakra-ui/react";
 
 export default function ProfilePage() {
-    // 認証必須（ログインしてないと /login に飛ぶ）
     useRequireAuth();
 
     return (
@@ -14,7 +13,6 @@ export default function ProfilePage() {
                     <ProfileForm />
                 </Box>
             </Center>
-            {/* <Bg /> */}
         </>
     );
 }
