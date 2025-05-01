@@ -2,7 +2,7 @@
 import { Box, IconButton, Input, Stack } from "@chakra-ui/react";
 import React, { useCallback, useState } from "react";
 import { IoMdSend } from "react-icons/io";
-import { IconContext } from "react-icons/lib";
+
 const ChatInput = React.memo(({ onSend, virtuosoRef }) => {
     const [message, setMessage] = useState("");
 
@@ -16,7 +16,6 @@ const ChatInput = React.memo(({ onSend, virtuosoRef }) => {
             if (!message.trim()) return;
             await onSend(message);
             setMessage("");
-
             if (virtuosoRef.current) {
                 virtuosoRef.current.scrollToIndex({
                     index: "LAST",
@@ -44,21 +43,19 @@ const ChatInput = React.memo(({ onSend, virtuosoRef }) => {
                     type='text'
                     value={message}
                 />
-                <IconContext.Provider value={{ size: "32px !important" }}>
-                    <IconButton
-                        color='gray.shark'
-                        aria-label='送信'
-                        size='2xl'
-                        type='submit'
-                        variant='ghost'>
-                        <IoMdSend />
-                    </IconButton>
-                </IconContext.Provider>
+
+                <IconButton
+                    color='gray.shark'
+                    aria-label='送信'
+                    size='2xl'
+                    type='submit'
+                    variant='ghost'>
+                    <IoMdSend />
+                </IconButton>
             </Stack>
         </Box>
     );
 });
 
 ChatInput.displayName = "ChatInput";
-
 export default ChatInput;

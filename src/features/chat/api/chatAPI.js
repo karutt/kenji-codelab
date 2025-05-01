@@ -1,4 +1,3 @@
-// src/features/chat/api/chatAPI.js
 import { auth, db } from "@/utils/firebase";
 import {
     addDoc,
@@ -12,8 +11,38 @@ import {
     startAfter,
 } from "firebase/firestore";
 
-export const listenToLatestMessages = (pageSize, callback) => {
-    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"), limit(pageSize));
+/**
+ * 初回静的取得
+ */
+export const fetchInitialMessages = async (collectionName, pageSize) => {
+    const q = query(collection(db, collectionName), orderBy("createdAt", "desc"), limit(pageSize));
+    const snap = await getDocs(q);
+    const lastDoc = snap.docs[snap.docs.length - 1] || null;
+    const messages = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return { messages: messages.reverse(), lastDoc };
+};
+
+/**
+ * 過去ページネーション取得
+ */
+export const fetchOlderMessages = async (collectionName, pageSize, afterDoc) => {
+    const q = query(
+        collection(db, collectionName),
+        orderBy("createdAt", "desc"),
+        startAfter(afterDoc),
+        limit(pageSize)
+    );
+    const snap = await getDocs(q);
+    const lastDoc = snap.docs[snap.docs.length - 1] || null;
+    const messages = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return { messages: messages.reverse(), lastDoc };
+};
+
+/**
+ * リアルタイム差分購読
+ */
+export const listenToLatestMessages = (collectionName, pageSize, callback) => {
+    const q = query(collection(db, collectionName), orderBy("createdAt", "desc"), limit(pageSize));
     const unsubscribe = onSnapshot(q, (snapshot) => {
         const changes = snapshot.docChanges().map((change) => ({
             type: change.type,
@@ -25,40 +54,16 @@ export const listenToLatestMessages = (pageSize, callback) => {
     return unsubscribe;
 };
 
-export const sendMessage = async (text) => {
+/**
+ * メッセージ送信
+ */
+export const sendMessage = async (collectionName, text) => {
     const { uid, displayName } = auth.currentUser || {};
     if (!text.trim()) return;
-    await addDoc(collection(db, "messages"), {
+    await addDoc(collection(db, collectionName), {
         text,
         createdAt: serverTimestamp(),
         uid,
         displayName,
     });
-};
-
-export const fetchInitialMessages = async (pageSize) => {
-    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"), limit(pageSize));
-    const snapshot = await getDocs(q);
-    const lastDoc = snapshot.docs[snapshot.docs.length - 1] || null;
-    const messages = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-    }));
-    return { messages: messages.reverse(), lastDoc };
-};
-
-export const fetchOlderMessages = async (pageSize, afterDoc) => {
-    const q = query(
-        collection(db, "messages"),
-        orderBy("createdAt", "desc"),
-        startAfter(afterDoc),
-        limit(pageSize)
-    );
-    const snapshot = await getDocs(q);
-    const lastDoc = snapshot.docs[snapshot.docs.length - 1] || null;
-    const messages = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-    }));
-    return { messages: messages.reverse(), lastDoc };
 };
