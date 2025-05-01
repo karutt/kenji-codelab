@@ -23,7 +23,7 @@ export default function Page() {
         .filter((config) => !config.slug.endsWith("_en"));
 
     return (
-        <div>
+        <div className='books'>
             <Lessons configs={configs} />
         </div>
     );

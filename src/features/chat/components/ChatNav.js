@@ -6,15 +6,15 @@ const chatLinks = [
         href: "/chat/global",
         label: "Global Chat",
         avatar: {
-            name: "Segun Adebayo",
+            name: "Global Chat",
             src: "/svg/global_chat.svg",
         },
     },
     {
-        href: "/chat/room",
+        href: "/chat/programming",
         label: "Programming Chat",
         avatar: {
-            name: "Segun Adebayo",
+            name: "Programming Chat",
             src: "/svg/prog_chat.svg",
         },
     },
