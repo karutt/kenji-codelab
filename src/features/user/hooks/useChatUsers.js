@@ -4,7 +4,6 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 export function useChatUsers(uids) {
-    console.log({ uids });
     const [users, setUsers] = useState({});
 
     useEffect(() => {

@@ -31,7 +31,7 @@ const ChatNav = () => (
         className='chat-nav'
         py={4}
         borderLeftRadius={8}>
-        <VStack align='stretch' gap={0}>
+        <VStack align='stretch' gap={0} borderRight='solid 1px' borderColor='brand.e2' h='100%'>
             {chatLinks.map(({ href, label, avatar }, index) => (
                 <ChakraLink
                     as={Link}
@@ -39,7 +39,8 @@ const ChatNav = () => (
                     _hover={{ bg: "gray.100" }}
                     px={4}
                     py={2}
-                    borderBottom={index !== chatLinks.length - 1 ? "1px solid #E2E8F0" : "none"}
+                    borderBottom={index !== chatLinks.length - 1 ? "1px solid" : "none"}
+                    borderColor='brand.e2'
                     key={href}>
                     <HStack p={2} borderRadius='md'>
                         <Avatar.Root>

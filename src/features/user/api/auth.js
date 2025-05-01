@@ -1,11 +1,12 @@
 // src/features/user/api/auth.js
-import { auth } from "@/utils/firebase";
+import { auth, db } from "@/utils/firebase";
 import {
     createUserWithEmailAndPassword,
     signOut as firebaseSignOut,
     signInWithEmailAndPassword,
     updateProfile,
 } from "firebase/auth";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 const setSessionCookie = async (idToken) => {
     const res = await fetch("/api/session", {
@@ -43,5 +44,24 @@ export const logout = async () => {
     return firebaseSignOut(auth);
 };
 
-export const updateUserProfile = ({ displayName, photoURL }) =>
-    updateProfile(auth.currentUser, { displayName, photoURL });
+export const updateUserProfile = async ({ displayName, photoURL }) => {
+    const user = auth.currentUser;
+    if (!user) throw new Error("ユーザーがサインインしていません");
+
+    // 1) Auth 側更新
+    await updateProfile(user, { displayName, photoURL });
+
+    // 2) Firestore 側更新 or 作成
+    const userRef = doc(db, "users", user.uid);
+    await setDoc(
+        userRef,
+        {
+            ...(displayName && { displayName }),
+            ...(photoURL && { photoURL }),
+            updatedAt: serverTimestamp(),
+        },
+        { merge: true } // ← ドキュメントがなければ作成、あればマージ
+    );
+
+    return user;
+};

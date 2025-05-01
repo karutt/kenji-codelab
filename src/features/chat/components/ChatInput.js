@@ -1,8 +1,8 @@
 "use client";
-import { IconButton, Input, Stack } from "@chakra-ui/react";
+import { Box, IconButton, Input, Stack } from "@chakra-ui/react";
 import React, { useCallback, useState } from "react";
 import { IoMdSend } from "react-icons/io";
-
+import { IconContext } from "react-icons/lib";
 const ChatInput = React.memo(({ onSend, virtuosoRef }) => {
     const [message, setMessage] = useState("");
 
@@ -29,30 +29,33 @@ const ChatInput = React.memo(({ onSend, virtuosoRef }) => {
     );
 
     return (
-        <form onSubmit={handleSubmit}>
+        <Box as='form' onSubmit={handleSubmit} px={4} py={2}>
             <Stack alignItems='center' direction='row'>
                 <Input
                     px={4}
                     py={6}
                     fontSize={16}
-                    borderColor='red.10'
-                    borderRadius='2xl'
+                    borderColor='brand.e2'
+                    borderRadius='full'
                     _focus={{ borderColor: "border.emphasized", outline: "none" }}
                     onChange={handleChange}
                     placeholder='メッセージを入力...'
+                    color='brand.shark'
                     type='text'
                     value={message}
                 />
-                <IconButton
-                    color='gray.focusRing'
-                    aria-label='送信'
-                    size='xl'
-                    type='submit'
-                    variant='ghost'>
-                    <IoMdSend />
-                </IconButton>
+                <IconContext.Provider value={{ size: "32px !important" }}>
+                    <IconButton
+                        color='gray.shark'
+                        aria-label='送信'
+                        size='2xl'
+                        type='submit'
+                        variant='ghost'>
+                        <IoMdSend />
+                    </IconButton>
+                </IconContext.Provider>
             </Stack>
-        </form>
+        </Box>
     );
 });
 

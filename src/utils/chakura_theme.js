@@ -17,11 +17,13 @@ const config = defineConfig({
                     shark: { value: "#212529" },
                     lilac: { value: "#F3F5FB" },
                     hitGray: { value: "#ADB5BD" },
+                    e7: { value: "#E7E9EE" },
                     blue75: { value: "rgba(55, 85, 190, 0.75)" },
                     geyser: { value: "#DEE2E6" },
                     lightBlue: { value: "#E0E5F4" },
                     zennBlue: { value: "#EDF2F6" },
                     green: { value: "#28a745" },
+                    e2: { value: "#E2E8F0" },
                 },
             },
             fonts: {

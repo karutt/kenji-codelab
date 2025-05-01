@@ -3,7 +3,7 @@
 import ChatInput from "@/features/chat/components/ChatInput";
 import ChatMessageList from "@/features/chat/components/ChatMessageList";
 import { usePaginatedChat } from "@/features/chat/hooks/usePaginatedChat";
-import { Box, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { useRef } from "react";
 
 const Chat = () => {
@@ -21,18 +21,15 @@ const Chat = () => {
                 bg='white'
                 boxShadow='md'
                 zIndex={2}
-                position='relative'>
-                <Box flex={1} minH={0}>
-                    <ChatMessageList
-                        messages={messages}
-                        virtuosoRef={virtuosoRef}
-                        onLoadOlder={loadOlderMessages}
-                        loadingOlder={loadingOlder}
-                    />
-                </Box>
-                <Box p={2} borderTop='1px solid #eee' bg='gray.50'>
-                    <ChatInput onSend={sendMessage} virtuosoRef={virtuosoRef} />
-                </Box>
+                position='relative'
+                borderRightRadius={8}>
+                <ChatMessageList
+                    messages={messages}
+                    virtuosoRef={virtuosoRef}
+                    onLoadOlder={loadOlderMessages}
+                    loadingOlder={loadingOlder}
+                />
+                <ChatInput onSend={sendMessage} virtuosoRef={virtuosoRef} />
             </Stack>
         </>
     );

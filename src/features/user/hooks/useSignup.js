@@ -2,14 +2,12 @@
 import { auth, db } from "@/utils/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { updateUserProfile } from "../api/auth"; // 追加
 
 export function useSignup() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const router = useRouter();
 
     const doSignup = async ({ displayName, email, password }) => {
         setError("");
@@ -43,9 +41,9 @@ export function useSignup() {
                 updatedAt: serverTimestamp(),
                 role: "user",
             });
-
+            
             // サインアップ後にトップページへリダイレクト
-            router.replace("/");
+            window.location.replace("/");
         } catch (err) {
             setError("登録に失敗しました。" + err.message);
         } finally {
