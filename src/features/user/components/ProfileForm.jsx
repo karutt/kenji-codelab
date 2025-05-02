@@ -49,10 +49,12 @@ export default function ProfileForm() {
             <Stack spacing='6' gap={2}>
                 <Center flexDir='column' gap={6}>
                     <Heading size='3xl'>Your Profile</Heading>
-                    <Avatar.Root size='full' w={44} h={44} borderRadius='full'>
-                        <Avatar.Fallback name={displayName} />
-                        <Avatar.Image src={avatarUrl} />
-                    </Avatar.Root>
+                    <Box w={164} h={164}>
+                        <Avatar.Root size='full' borderRadius='full'>
+                            <Avatar.Fallback name={displayName} />
+                            <Avatar.Image src={avatarUrl} />
+                        </Avatar.Root>
+                    </Box>
                 </Center>
                 <Fieldset.Root size='lg'>
                     <Fieldset.Content>

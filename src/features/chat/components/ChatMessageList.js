@@ -57,9 +57,9 @@ const ChatMessageList = ({ messages, virtuosoRef, onLoadOlder, loadingOlder }) =
                                 {!isOwn &&
                                     (message.uid && userMap[message.uid] ? (
                                         <Avatar.Root size='sm' mt={6}>
-                                            <Avatar.Fallback>
-                                                {userMap[message.uid].displayName}
-                                            </Avatar.Fallback>
+                                            <Avatar.Fallback
+                                                name={userMap[message.uid].displayName}
+                                            />
                                             <Avatar.Image src={userMap[message.uid].photoURL} />
                                         </Avatar.Root>
                                     ) : (
@@ -97,9 +97,7 @@ const ChatMessageList = ({ messages, virtuosoRef, onLoadOlder, loadingOlder }) =
                                 {/* 右揃えならアバターを右側に */}
                                 {isOwn && message.uid && userMap[message.uid] && (
                                     <Avatar.Root size='sm' mt={6}>
-                                        <Avatar.Fallback>
-                                            {userMap[message.uid].displayName}
-                                        </Avatar.Fallback>
+                                        <Avatar.Fallback name={userMap[message.uid].displayName} />
                                         <Avatar.Image src={userMap[message.uid].photoURL} />
                                     </Avatar.Root>
                                 )}

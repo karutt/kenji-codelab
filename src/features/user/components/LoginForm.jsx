@@ -11,6 +11,7 @@ import {
     Separator,
     Stack,
     Text,
+    Spinner,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -65,6 +66,7 @@ export default function LoginForm() {
                 </Fieldset.Root>
                 <Button type='submit' colorScheme='blue' isLoading={loading} bg='brand.blue'>
                     Sign In
+                    {loading && <Spinner ml={2} size='xs' />}
                 </Button>
                 <Separator />
                 <Text textAlign='center'>

@@ -9,6 +9,7 @@ import {
     Input,
     Link,
     Separator,
+    Spinner,
     Stack,
     Text,
 } from "@chakra-ui/react";
@@ -96,6 +97,7 @@ export default function SignupForm() {
                     w='full'
                     bg='brand.blue'>
                     Sign Up
+                    {loading && <Spinner size='sm' ml={2} />}
                 </Button>
                 <Separator />
                 <Text textAlign='center'>

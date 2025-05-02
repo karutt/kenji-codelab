@@ -21,11 +21,27 @@ const setSessionCookie = async (idToken) => {
 };
 
 export const signup = async ({ email, password, displayName, photoURL }) => {
+    // 1) Firebase Auth でユーザー作成
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
+
+    // 2) Auth プロフィール更新
     await updateProfile(user, { displayName, photoURL });
-    // サーバー側にトークン渡して Cookie をセット
+
+    // 3) セッション Cookie 用トークン取得＆セット
     const idToken = await user.getIdToken();
     await setSessionCookie(idToken);
+
+    // 4) Firestore にユーザードキュメント登録
+    await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        displayName,
+        email,
+        photoURL,
+        role: "user",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+    });
+
     return user;
 };
 
