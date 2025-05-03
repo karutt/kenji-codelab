@@ -1,0 +1,72 @@
+import { useEffect, useMemo, useState } from "react";
+import markdownHtml from "zenn-markdown-html";
+import { parseProblemContent } from "../utils/parseProblemContent";
+import { addCodeToNotion } from "@/components/notion/actions";
+
+export function useProblems(problemMarkdown, articleSlug, bookSlug) {
+    // Markdown→HTML
+    const problemHtml = useMemo(() => markdownHtml(problemMarkdown), [problemMarkdown]);
+
+    // <h1> 要素配列
+    const headers = useMemo(() => {
+        const doc = new DOMParser().parseFromString(problemHtml, "text/html");
+        return Array.from(doc.querySelectorAll("h1"));
+    }, [problemHtml]);
+
+    // code 入力と submit フラグ
+    const [codes, setCodes] = useState(() => Array(headers.length).fill(""));
+    const [loading, setLoading] = useState(() => Array(headers.length).fill(false));
+
+    // 問題数変動時に defaultCode をセット
+    useEffect(() => {
+        setCodes((prev) => {
+            const next = [...prev];
+            headers.forEach((h, i) => {
+                const { defaultCode } = parseProblemContent(h);
+                if (next[i] == null) next[i] = defaultCode;
+            });
+            return next.slice(0, headers.length);
+        });
+    }, [headers]);
+
+    // コード変更
+    const onChange = (i, v) => {
+        setCodes((prev) => {
+            const next = [...prev];
+            next[i] = v;
+            return next;
+        });
+    };
+
+    // 提出
+    const onSubmit = async (i) => {
+        if (loading[i]) return;
+        setLoading((prev) => {
+            const next = [...prev];
+            next[i] = true;
+            return next;
+        });
+
+        try {
+            await addCodeToNotion({
+                title: `問題 ${i + 1}`,
+                code: codes[i],
+                name: localStorage.getItem("kenji_name") || "",
+                index: i + 1,
+                articleSlug,
+                bookSlug,
+            });
+            alert(`問題 ${i + 1} 提出完了！`);
+        } catch {
+            alert("提出失敗…");
+        } finally {
+            setLoading((prev) => {
+                const next = [...prev];
+                next[i] = false;
+                return next;
+            });
+        }
+    };
+
+    return { headers, codes, loading, onChange, onSubmit };
+}
