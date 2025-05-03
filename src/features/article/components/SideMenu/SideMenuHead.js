@@ -1,7 +1,13 @@
+// src/components/SideMenu/SideMenuHead.js
+"use client";
+
+import { useBookConfig } from "@/contexts/BookConfigContext";
 import { Box, Icon } from "@/styles";
 import Link from "next/link";
 
-export default function SideMenuHead({ config, bookName }) {
+export default function SideMenuHead({ bookName }) {
+    const config = useBookConfig();
+
     return (
         <Box
             borderBottom='1px solid rgba(0, 0, 0, 0.1)'
@@ -11,7 +17,7 @@ export default function SideMenuHead({ config, bookName }) {
             px={32}
             borderRadius={10}>
             <Link href={`/books/${bookName}`}>
-                <Box display='flex' alignItems='center' justifyContent='flex-start' gap={12}>
+                <Box display='flex' alignItems='center' gap={12}>
                     <Icon name={`${bookName}_icon`} width={48} height='100%' />
                     <Box>
                         <Box fontSize={18} fontWeight='500' color='shark'>

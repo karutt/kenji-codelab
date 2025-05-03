@@ -1,12 +1,12 @@
+// src/components/SideMenu/SideMenu.js
 "use client";
-import { Box, Icon } from "@/styles";
-import { useSideMenu } from "@/components/SideMenu/SideMenuContext";
 
 import { SideMenuCard, SideMenuHeadCard } from "@/components/common/Card";
-import SideMenuHead from "./SideMenuHead";
+import { Box } from "@/styles";
 import SideMenuBody from "./SideMenuBody";
-
-export default function SideMenu({ config, bookName, articleSlug }) {
+import { useSideMenu } from "./SideMenuContext";
+import SideMenuHead from "./SideMenuHead";
+export default function SideMenu({ bookName, articleSlug }) {
     const { showSideMenu } = useSideMenu();
 
     return (
@@ -21,10 +21,10 @@ export default function SideMenu({ config, bookName, articleSlug }) {
             className='side-menu'
             display={["none", "none", showSideMenu ? "block" : "none"]}>
             <SideMenuHeadCard>
-                <SideMenuHead config={config} bookName={bookName} />
+                <SideMenuHead bookName={bookName} />
             </SideMenuHeadCard>
             <SideMenuCard>
-                <SideMenuBody config={config} bookName={bookName} articleSlug={articleSlug} />
+                <SideMenuBody bookName={bookName} articleSlug={articleSlug} />
             </SideMenuCard>
         </Box>
     );

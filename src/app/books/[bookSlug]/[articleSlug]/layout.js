@@ -1,7 +1,7 @@
 // src/app/[bookSlug]/layout.js
-import SideMenu from "@/components/SideMenu/SideMenu";
-import { SideMenuProvider } from "@/components/SideMenu/SideMenuContext";
 import { BookConfigProvider } from "@/contexts/BookConfigContext";
+import SideMenu from "@/features/article/components/SideMenu/SideMenu";
+import { SideMenuProvider } from "@/features/article/components/SideMenu/SideMenuContext";
 import fs from "fs";
 import path from "path";
 
@@ -21,11 +21,10 @@ export default function Layout({ children, params }) {
                         background: "#EDF2F6",
                         marginTop: "64px",
                     }}>
-                    <SideMenu config={config} bookName={bookSlug} articleSlug={articleSlug} />
+                    <SideMenu bookName={bookSlug} articleSlug={articleSlug} />
                     {children}
                 </div>
             </BookConfigProvider>
         </SideMenuProvider>
     );
 }
-

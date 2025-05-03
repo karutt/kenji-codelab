@@ -1,23 +1,26 @@
 // src/contexts/BookConfigContext.js
 "use client";
 
-import { createContext, useContext } from "react";
+import React, { createContext, useContext } from "react";
+
+// React クライアントコンテキストのみを定義します。
+// サーバーサイドの fs 読み込みは app/[bookSlug]/layout.js 側で行い、
+// ここでは受け取った config をコンテキストとして提供します。
+const BookConfigContext = createContext(null);
 
 /**
- * Context to provide book-specific configuration.
+ * コンテキストプロバイダー
+ * @param {{ children: React.ReactNode, config: object }} props
  */
-export const BookConfigContext = createContext(null);
-
-/**
- * Provider component to wrap parts of the app that need access to book config.
- */
-export function BookConfigProvider({ config, children }) {
+export function BookConfigProvider({ children, config }) {
+    if (!config) {
+        throw new Error("BookConfigProvider requires a `config` prop");
+    }
     return <BookConfigContext.Provider value={config}>{children}</BookConfigContext.Provider>;
 }
 
 /**
- * useBookConfig:
- * Hook to consume the book config in client components.
+ * コンテキスト値を取得するカスタムフック
  */
 export function useBookConfig() {
     const context = useContext(BookConfigContext);
