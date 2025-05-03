@@ -1,7 +1,8 @@
+import { addCodeToNotion } from "@/components/notion/actions";
+import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useMemo, useState } from "react";
 import markdownHtml from "zenn-markdown-html";
 import { parseProblemContent } from "../utils/parseProblemContent";
-import { addCodeToNotion } from "@/components/notion/actions";
 
 export function useProblems(problemMarkdown, articleSlug, bookSlug) {
     // Markdown→HTML
@@ -38,6 +39,8 @@ export function useProblems(problemMarkdown, articleSlug, bookSlug) {
         });
     };
 
+    const { user } = useAuth();
+
     // 提出
     const onSubmit = async (i) => {
         if (loading[i]) return;
@@ -51,7 +54,7 @@ export function useProblems(problemMarkdown, articleSlug, bookSlug) {
             await addCodeToNotion({
                 title: `問題 ${i + 1}`,
                 code: codes[i],
-                name: localStorage.getItem("kenji_name") || "",
+                name: (user && user.displayName) || localStorage.getItem("kenji_name") || "",
                 index: i + 1,
                 articleSlug,
                 bookSlug,

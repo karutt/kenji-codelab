@@ -5,6 +5,7 @@ import { ToggleBtn } from "@/components/common/Btn";
 import { ArticleCard } from "@/components/common/Card";
 import { InputField } from "@/components/common/Input";
 import Modal from "@/components/common/Modal";
+import { useAuth } from "@/contexts/AuthContext";
 import { useSideMenu } from "@/features/article/components/SideMenu/SideMenuContext";
 import ProblemSet from "@/features/problem/components/ProblemSet";
 import { Box } from "@/styles";
@@ -29,9 +30,11 @@ export default function ArticleContent({
     const [showCard, setShowCard] = useState(false);
     const [showProblem, setShowProblem] = useState(false);
     const { showSideMenu, setShowSideMenu } = useSideMenu();
+    const { user } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
 
+    // view パラメータに応じて表示切り替え
     useEffect(() => {
         const view = searchParams.get("view");
         if (view === "card") {
@@ -48,6 +51,7 @@ export default function ArticleContent({
         }
     }, [searchParams, setShowSideMenu]);
 
+    // カード表示のトグル
     const toggleCardView = () => {
         if (showCard) {
             setShowCard(false);
@@ -60,16 +64,24 @@ export default function ArticleContent({
         }
     };
 
+    // 名前入力モーダル用フック
     const { name, setName, isModalOpen, openModal, closeModal, saveNameToLocalStorage } =
         useKenjiName(router, setShowProblem, setShowCard, setShowSideMenu);
 
+    // 問題表示のトグル（ログイン済は直接表示、未ログインはモーダル）
     const toggleProblemView = () => {
         if (showProblem) {
             setShowProblem(false);
             setShowSideMenu(true);
             router.back();
         } else {
-            openModal();
+            if (user) {
+                setShowProblem(true);
+                setShowCard(false);
+                setShowSideMenu(false);
+            } else {
+                openModal();
+            }
         }
     };
 
@@ -146,43 +158,46 @@ export default function ArticleContent({
 
             {showCardBtn && <ToggleBtn toggle={showCard} onClick={toggleCardView} />}
 
-            <Modal isOpen={isModalOpen}>
-                <Box fontSize={24} fontWeight='bold' mb={8}>
-                    あなたの名前を入力
-                </Box>
-                <Box color='abbey' fontSize={14} mb={24}>
-                    「決定」を押すと名前が保存され、問題が開始されます。
-                </Box>
-                <InputField
-                    type='text'
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder='名前を入力'
-                />
-                <Box
-                    onClick={saveNameToLocalStorage}
-                    mt={24}
-                    mb={8}
-                    width='100%'
-                    bg='blue'
-                    color='white'
-                    borderRadius={4}
-                    py={10}
-                    style={{ cursor: "pointer" }}>
-                    決定
-                </Box>
-                <Box
-                    onClick={closeModal}
-                    width='100%'
-                    bg='white'
-                    color='abbey'
-                    border='1.5px solid #dee2e6'
-                    borderRadius={4}
-                    py={10}
-                    style={{ cursor: "pointer" }}>
-                    キャンセル
-                </Box>
-            </Modal>
+            {/* 未ログイン時のみ名前入力モーダル */}
+            {!user && (
+                <Modal isOpen={isModalOpen}>
+                    <Box fontSize={24} fontWeight='bold' mb={8}>
+                        あなたの名前を入力
+                    </Box>
+                    <Box color='abbey' fontSize={14} mb={24}>
+                        「決定」を押すと名前が保存され、問題が開始されます。
+                    </Box>
+                    <InputField
+                        type='text'
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder='名前を入力'
+                    />
+                    <Box
+                        onClick={saveNameToLocalStorage}
+                        mt={24}
+                        mb={8}
+                        width='100%'
+                        bg='blue'
+                        color='white'
+                        borderRadius={4}
+                        py={10}
+                        style={{ cursor: "pointer" }}>
+                        決定
+                    </Box>
+                    <Box
+                        onClick={closeModal}
+                        width='100%'
+                        bg='white'
+                        color='abbey'
+                        border='1.5px solid #dee2e6'
+                        borderRadius={4}
+                        py={10}
+                        style={{ cursor: "pointer" }}>
+                        キャンセル
+                    </Box>
+                </Modal>
+            )}
 
             <Box
                 mt={24}

@@ -3,13 +3,7 @@ import "zenn-content-css";
 import { useProblems } from "../hooks/useProblems";
 import ProblemList from "./ProblemList";
 
-export default function ProblemSet({
-    problemMarkdown,
-    articleSlug,
-    bookSlug,
-    onClick,
-    showProblem,
-}) {
+export default function ProblemSet({ problemMarkdown, articleSlug, bookSlug }) {
     const { headers, codes, loading, onChange, onSubmit } = useProblems(
         problemMarkdown,
         articleSlug,
