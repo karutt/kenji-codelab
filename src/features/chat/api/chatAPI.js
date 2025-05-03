@@ -2,6 +2,8 @@ import { auth, db } from "@/utils/firebase";
 import {
     addDoc,
     collection,
+    deleteDoc, // 追加
+    doc,
     getDocs,
     limit,
     onSnapshot,
@@ -66,4 +68,16 @@ export const sendMessage = async (collectionName, text) => {
         uid,
         displayName,
     });
+};
+
+/**
+ * チャット内の全てのコメントを削除
+ */
+export const deleteAllMessages = async (collectionName) => {
+    const colRef = collection(db, collectionName);
+    const snap = await getDocs(colRef);
+    const batchDeletes = snap.docs.map((d) => {
+        deleteDoc(doc(db, collectionName, d.id));
+    });
+    await Promise.all(batchDeletes);
 };

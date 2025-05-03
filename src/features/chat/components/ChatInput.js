@@ -1,7 +1,9 @@
 "use client";
 import { Box, IconButton, Input, Stack } from "@chakra-ui/react";
+import { useParams } from "next/navigation";
 import React, { useCallback, useState } from "react";
 import { IoMdSend } from "react-icons/io";
+import { deleteAllMessages } from "../api/chatAPI";
 
 const ChatInput = React.memo(({ onSend, virtuosoRef }) => {
     const [message, setMessage] = useState("");
@@ -26,6 +28,11 @@ const ChatInput = React.memo(({ onSend, virtuosoRef }) => {
         },
         [message, onSend, virtuosoRef]
     );
+
+    // const { slug } = useParams();
+    // const handleDeleteAll = useCallback(async () => {
+    //     await deleteAllMessages(slug);
+    // }, [slug]);
 
     return (
         <Box as='form' onSubmit={handleSubmit} px={4} py={2}>
@@ -52,10 +59,20 @@ const ChatInput = React.memo(({ onSend, virtuosoRef }) => {
                     variant='ghost'>
                     <IoMdSend />
                 </IconButton>
+                {/* 
+                <IconButton
+                    color='red.400'
+                    aria-label='全て削除'
+                    size='2xl'
+                    type='button'
+                    variant='ghost'
+                    ml={2}
+                    onClick={handleDeleteAll}>
+                    <span style={{ fontWeight: "bold" }}>全削除</span>
+                </IconButton> */}
             </Stack>
         </Box>
     );
 });
 
-ChatInput.displayName = "ChatInput";
 export default ChatInput;
