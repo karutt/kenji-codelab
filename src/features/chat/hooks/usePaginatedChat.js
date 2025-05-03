@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase/firestore";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
     fetchInitialMessages,
@@ -37,6 +38,12 @@ export const usePaginatedChat = (pageSize = 20, collectionName) => {
                             const docData = { id: chg.doc.id, ...chg.doc.data() };
                             if (chg.type === "added") {
                                 if (!updated.find((m) => m.id === docData.id)) {
+                                    if (!docData.createdAt) {
+                                        // +2秒してセット
+                                        const now = new Date();
+                                        now.setSeconds(now.getSeconds() + 1);
+                                        docData.createdAt = Timestamp.fromDate(now);
+                                    }
                                     updated.push(docData);
                                 }
                             } else if (chg.type === "modified") {

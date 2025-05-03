@@ -23,7 +23,7 @@ const ChatMessageList = ({ messages, virtuosoRef, onLoadOlder, loadingOlder }) =
     React.useEffect(() => {
         const prevMessages = prevMessagesRef.current;
         const addedCount = messages.length - prevMessages.length;
-        setFirstItemIndex((prev) => prev - addedCount);
+        if (addedCount > 1) setFirstItemIndex((prev) => prev - addedCount);
         prevMessagesRef.current = messages;
     }, [messages]);
 

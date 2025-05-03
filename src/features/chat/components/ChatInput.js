@@ -1,9 +1,7 @@
 "use client";
 import { Box, IconButton, Input, Stack } from "@chakra-ui/react";
-import { useParams } from "next/navigation";
 import React, { useCallback, useState } from "react";
 import { IoMdSend } from "react-icons/io";
-import { deleteAllMessages } from "../api/chatAPI";
 
 const ChatInput = React.memo(({ onSend, virtuosoRef }) => {
     const [message, setMessage] = useState("");
@@ -74,5 +72,7 @@ const ChatInput = React.memo(({ onSend, virtuosoRef }) => {
         </Box>
     );
 });
+
+ChatInput.displayName = "ChatInput";
 
 export default ChatInput;

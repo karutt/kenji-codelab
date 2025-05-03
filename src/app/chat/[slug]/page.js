@@ -20,7 +20,7 @@ const Chat = () => {
 
     // Hooks は常に呼び出す（無効な slug の場合は空文字を渡して fetch を止める）
     const { messages, sendMessage, loadOlderMessages, loadingOlder } = usePaginatedChat(
-        20,
+        12,
         isValid ? slug : ""
     );
 
