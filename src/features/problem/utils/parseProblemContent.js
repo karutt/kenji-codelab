@@ -16,6 +16,8 @@ export function parseProblemContent(header) {
         current = current.nextElementSibling;
     }
 
+    console.log(defaultCode);
+
     return {
         problemContent: contents.join(" "),
         defaultCode,

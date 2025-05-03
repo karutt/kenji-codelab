@@ -3,9 +3,6 @@
 
 import React, { createContext, useContext } from "react";
 
-// React クライアントコンテキストのみを定義します。
-// サーバーサイドの fs 読み込みは app/[bookSlug]/layout.js 側で行い、
-// ここでは受け取った config をコンテキストとして提供します。
 const BookConfigContext = createContext(null);
 
 /**

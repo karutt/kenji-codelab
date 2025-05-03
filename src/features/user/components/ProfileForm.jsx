@@ -8,7 +8,6 @@ import {
     Fieldset,
     Heading,
     Input,
-    Presence,
     Separator,
     Stack,
 } from "@chakra-ui/react";
@@ -86,32 +85,6 @@ export default function ProfileForm() {
                                 placeholder='https://example.com/avatar.png'
                             />
                         </Field.Root>
-
-                        <Presence
-                            position='fixed'
-                            top='90%'
-                            right={"2%"}
-                            present={showStatus && (status === "error" || status === "success")}
-                            animationName={{
-                                _open: "slide-from-right, fade-in",
-                                _closed: "slide-to-right, fade-out",
-                            }}
-                            width='300px'
-                            animationDuration='moderate'>
-                            <Center
-                                p='6'
-                                borderRadius={"md"}
-                                layerStyle='fill.muted'
-                                bg={status === "error" ? "red.500" : "green.500"}
-                                color='white'
-                                fontSize='md'>
-                                {status === "error"
-                                    ? "プロフィールの更新に失敗しました。"
-                                    : status === "success"
-                                    ? "プロフィールを更新しました。"
-                                    : null}
-                            </Center>
-                        </Presence>
                     </Fieldset.Content>
                 </Fieldset.Root>
 

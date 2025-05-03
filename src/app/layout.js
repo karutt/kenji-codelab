@@ -1,4 +1,5 @@
 import { Provider } from "@/components/ui/provider";
+import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import "@/css/globals.css";
 import "@/css/normalize.css";
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
                             <AuthProvider>
                                 <Header />
                                 {children}
+                                <Toaster />
                                 <Footer />
                                 <AuthSync />
                             </AuthProvider>

@@ -1,4 +1,5 @@
 /* src/features/user/hooks/useProfile.js */
+import { toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -30,9 +31,17 @@ export function useProfile() {
                 displayName,
                 photoURL: avatarUrl.trim() || undefined,
             });
+            toaster.create({
+                description: "プロフィールを更新しました。",
+                type: "success",
+            });
             setStatus("success");
         } catch (e) {
             console.error(e);
+            toaster.create({
+                description: "プロフィールの更新に失敗しました。",
+                type: "error",
+            });
             setStatus("error");
         }
     }, [displayName, avatarUrl]);
