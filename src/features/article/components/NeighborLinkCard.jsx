@@ -1,6 +1,5 @@
-import React from "react";
-import Link from "next/link";
 import { Box } from "@/styles";
+import Link from "next/link";
 
 /** 前後記事へのリンクカード */
 export default function NeighborLinkCard({ link, title, next }) {

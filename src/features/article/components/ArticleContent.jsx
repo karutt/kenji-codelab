@@ -1,20 +1,21 @@
+// src/features/article/components/ArticleContent.jsx
 "use client";
 
 import CardSet from "@/components/CardSet/CardSet";
 import { ToggleBtn } from "@/components/common/Btn";
 import { ArticleCard } from "@/components/common/Card";
-import { InputField } from "@/components/common/Input";
-import Modal from "@/components/common/Modal";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSideMenu } from "@/features/article/components/SideMenu/SideMenuContext";
 import ProblemSet from "@/features/problem/components/ProblemSet";
 import { Box } from "@/styles";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "zenn-content-css";
 import { useKenjiName } from "../hooks/useKenjiName";
+import { injectCopyButtons } from "../utils/injectCopyButtons";
 import { parseMarkdownToHtml } from "../utils/markdownParser";
 import ArticleHead from "./ArticleHead";
+import NameModal from "./NameModal";
 import NeighborLinkCard from "./NeighborLinkCard";
 
 export default function ArticleContent({
@@ -27,6 +28,8 @@ export default function ArticleContent({
     neighborsPage,
 }) {
     const articleHtml = parseMarkdownToHtml(markdown);
+    const htmlWithButtons = useMemo(() => injectCopyButtons(articleHtml), [articleHtml]);
+
     const [showCard, setShowCard] = useState(false);
     const [showProblem, setShowProblem] = useState(false);
     const { showSideMenu, setShowSideMenu } = useSideMenu();
@@ -34,7 +37,9 @@ export default function ArticleContent({
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // view パラメータに応じて表示切り替え
+    // コードブロックのコピー機能を有効化
+    const contentRef = useRef(null);
+
     useEffect(() => {
         const view = searchParams.get("view");
         if (view === "card") {
@@ -51,7 +56,6 @@ export default function ArticleContent({
         }
     }, [searchParams, setShowSideMenu]);
 
-    // カード表示のトグル
     const toggleCardView = () => {
         if (showCard) {
             setShowCard(false);
@@ -64,11 +68,9 @@ export default function ArticleContent({
         }
     };
 
-    // 名前入力モーダル用フック
     const { name, setName, isModalOpen, openModal, closeModal, saveNameToLocalStorage } =
         useKenjiName(router, setShowProblem, setShowCard, setShowSideMenu);
 
-    // 問題表示のトグル（ログイン済は直接表示、未ログインはモーダル）
     const toggleProblemView = () => {
         if (showProblem) {
             setShowProblem(false);
@@ -79,6 +81,7 @@ export default function ArticleContent({
                 setShowProblem(true);
                 setShowCard(false);
                 setShowSideMenu(false);
+                router.push("?view=problem", { scroll: false });
             } else {
                 openModal();
             }
@@ -87,45 +90,6 @@ export default function ArticleContent({
 
     const showCardBtn = Boolean(card);
     const showProblemBtn = Boolean(problem);
-
-    // コードブロックにコピーボタンを追加
-    useEffect(() => {
-        const containers = document.querySelectorAll(".code-block-container");
-        containers.forEach((container) => {
-            if (!container.querySelector(".copy-button")) {
-                container.style.position = "relative";
-                const btn = document.createElement("button");
-                btn.className = "copy-button";
-                btn.innerHTML = `
-<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d="M16 1H4C2.89543 1 2 1.89543 2 3V17H4V3H16V1Z"/>
-  <path d="M19 5H8C6.89543 5 6 5.89543 6 7V21C6 22.1046 6.89543 23 8 23H19C20.1046 23 21 22.1046 21 21V7C21 5.89543 20.1046 5 19 5ZM19 21H8V7H19V21Z"/>
-</svg>`;
-                btn.style.position = "absolute";
-                btn.style.top = "10px";
-                btn.style.right = "10px";
-                btn.style.cursor = "pointer";
-                btn.addEventListener("click", () => {
-                    const codeEl = container.querySelector("pre code");
-                    if (codeEl) {
-                        let txt = codeEl.innerText;
-                        if (txt.endsWith("\n")) txt = txt.slice(0, -1);
-                        navigator.clipboard
-                            .writeText(txt)
-                            .then(() => {
-                                const tip = document.createElement("div");
-                                tip.className = "copy-tooltip";
-                                tip.textContent = "コピーしました！";
-                                container.appendChild(tip);
-                                setTimeout(() => tip.remove(), 1500);
-                            })
-                            .catch((e) => console.error("コピー失敗:", e));
-                    }
-                });
-                container.insertBefore(btn, container.firstChild);
-            }
-        });
-    }, [articleHtml]);
 
     return (
         <Box as='article' className='znc' color='shark' my={32} width='100%' maxWidth={860}>
@@ -151,52 +115,21 @@ export default function ArticleContent({
                             onClick={toggleProblemView}
                         />
                     ) : (
-                        <div dangerouslySetInnerHTML={{ __html: articleHtml }} />
+                        <div dangerouslySetInnerHTML={{ __html: htmlWithButtons }} />
                     )}
                 </Box>
             </ArticleCard>
 
             {showCardBtn && <ToggleBtn toggle={showCard} onClick={toggleCardView} />}
 
-            {/* 未ログイン時のみ名前入力モーダル */}
             {!user && (
-                <Modal isOpen={isModalOpen}>
-                    <Box fontSize={24} fontWeight='bold' mb={8}>
-                        あなたの名前を入力
-                    </Box>
-                    <Box color='abbey' fontSize={14} mb={24}>
-                        「決定」を押すと名前が保存され、問題が開始されます。
-                    </Box>
-                    <InputField
-                        type='text'
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder='名前を入力'
-                    />
-                    <Box
-                        onClick={saveNameToLocalStorage}
-                        mt={24}
-                        mb={8}
-                        width='100%'
-                        bg='blue'
-                        color='white'
-                        borderRadius={4}
-                        py={10}
-                        style={{ cursor: "pointer" }}>
-                        決定
-                    </Box>
-                    <Box
-                        onClick={closeModal}
-                        width='100%'
-                        bg='white'
-                        color='abbey'
-                        border='1.5px solid #dee2e6'
-                        borderRadius={4}
-                        py={10}
-                        style={{ cursor: "pointer" }}>
-                        キャンセル
-                    </Box>
-                </Modal>
+                <NameModal
+                    isOpen={isModalOpen}
+                    name={name}
+                    onChange={setName}
+                    onSave={saveNameToLocalStorage}
+                    onCancel={closeModal}
+                />
             )}
 
             <Box
