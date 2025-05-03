@@ -25,9 +25,6 @@ export default function ProblemSet({
                 onChange={onChange}
                 onSubmit={onSubmit}
             />
-            <div style={{ marginTop: 24 }}>
-                <button onClick={onClick}>{showProblem ? "問題を隠す" : "問題を表示"}</button>
-            </div>
         </div>
     );
 }

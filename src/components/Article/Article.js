@@ -2,12 +2,13 @@
 "use client";
 
 import CardSet from "@/components/CardSet/CardSet";
-import ProblemSet from "@/components/ProblemSet/ProblemSet";
+
 import { useSideMenu } from "@/components/SideMenu/SideMenuContext";
 import { ToggleBtn } from "@/components/common/Btn";
 import { ArticleCard } from "@/components/common/Card";
 import { InputField } from "@/components/common/Input";
 import Modal from "@/components/common/Modal";
+import ProblemSet from "@/features/problem/components/ProblemSet";
 import { Box } from "@/styles";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
