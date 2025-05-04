@@ -19,10 +19,7 @@ export default function SideMenuBody({ bookName, articleSlug }) {
                             Chapter {index + 1}
                         </Box>
                         <Link href={`/books/${bookName}/${index + 1}-0`}>
-                            <Box
-                                fontSize={18}
-                                fontWeight={isChapterActive ? "700" : "500"}
-                                bg={isChapterActive ? "lilac" : "white"}>
+                            <Box fontSize={18} fontWeight={isChapterActive ? "700" : "500"}>
                                 {list[0]}
                             </Box>
                         </Link>

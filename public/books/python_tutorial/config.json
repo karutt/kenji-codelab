@@ -1,0 +1,14 @@
+{
+  "title": "Python  Beginner's Course",
+  "subTitle": "Python入門",
+  "category": "python / raspberry pi",
+  "description": "Pythonを使い、基本文法やRaspberry Piの使い方を学ぶ入門講座",
+  "estimatedTime": "2 hours",
+  "language": "python",
+  "bookList": [
+    [
+      "§1.0 Pythonとは？"
+    ]
+  ],
+  "articleCount": 1
+}

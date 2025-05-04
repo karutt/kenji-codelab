@@ -1,29 +1,33 @@
 {
-    "title": "P5.js  Beginner's Course",
-    "subTitle": "Javascript入門",
-    "category": "javascript / p5.js",
-    "description": "p5.jsを使い、図形描画やアニメーション、基本文法を学ぶ入門講座",
-    "estimatedTime": "5 hours",
-    "language": "javascript",
-    "bookList": [
-        [
-            "プログラムを書く準備",
-            "§1.1 - p5.jsを始める準備（環境構築）",
-            "§1.2 - HTML, CSS, JavaScript, そしてp5.js",
-            "§1.3 - プロジェクトのファイル構成",
-            "§1.4 - カード・テストの使い方",
-            "§1.5 - 簡易的なセットアップとテストの出力"
-        ],
-        [
-            "図形を描く",
-            "§2.1 - 基本的な図形",
-            "§2.2 - 描画のルール",
-            "§2.3 - 変数",
-            "§2.4 - 計算",
-            "§2.5 - アニメーション",
-            "§2.6 - 描画関数まとめ（Reference）"
-        ],
-        ["プログラミングの文法", "§3.1 - if 文（条件分岐）", "§3.2 - for 文（繰り返し処理）"]
+  "title": "P5.js  Beginner's Course",
+  "subTitle": "Javascript入門",
+  "category": "javascript / p5.js",
+  "description": "p5.jsを使い、図形描画やアニメーション、基本文法を学ぶ入門講座",
+  "estimatedTime": "5 hours",
+  "language": "javascript",
+  "bookList": [
+    [
+      "プログラムを書く準備",
+      "§1.1 - p5.jsを始める準備（環境構築）",
+      "§1.2 - HTML, CSS, JavaScript, そしてp5.js",
+      "§1.3 - プロジェクトのファイル構成",
+      "§1.4 - カード・テストの使い方",
+      "§1.5 - 簡易的なセットアップとテストの出力"
     ],
-    "articleCount": 17
+    [
+      "図形を描く",
+      "§2.1 - 基本的な図形",
+      "§2.2 - 描画のルール",
+      "§2.3 - 変数",
+      "§2.4 - 計算",
+      "§2.5 - アニメーション",
+      "§2.6 - 描画関数まとめ（Reference）"
+    ],
+    [
+      "プログラミングの文法",
+      "§3.1 - if 文（条件分岐）",
+      "§3.2 - for 文（繰り返し処理）"
+    ]
+  ],
+  "articleCount": 16
 }

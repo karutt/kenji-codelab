@@ -14,6 +14,7 @@ export default function Layout({ children, params }) {
         <SideMenuProvider>
             <BookConfigProvider config={config}>
                 <div
+                    className='books'
                     style={{
                         display: "flex",
                         justifyContent: "center",

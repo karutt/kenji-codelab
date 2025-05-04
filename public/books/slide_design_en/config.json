@@ -1,14 +1,30 @@
 {
-    "title": "Introduction to Creating Slides with Canva",
-    "subTitle": "Slide Creation Basics",
-    "category": "application / Canva",
-    "description": "An introductory course on how to create slides using Canva.",
-    "estimatedTime": "1 hour",
-    "bookList": [
-        ["§1.0 Creating Slides", "§1.1 Placing Text", "§1.2 Text Size and Font"],
-        ["§2.0 Layout", "§2.1 Aligning Positions", "§2.2 Distribute Evenly", "§2.3 Adding Margins"],
-        ["§3.0 Using Figures and Graphs", "§3.1 Icons"],
-        ["§4.0 Summarizing", "§4.1 Summary of a Sample Paper", "§4.1 Sample Paper Slides (Answer)"]
+  "title": "Introduction to Creating Slides with Canva",
+  "subTitle": "Slide Creation Basics",
+  "category": "application / Canva",
+  "description": "An introductory course on how to create slides using Canva.",
+  "estimatedTime": "1 hour",
+  "bookList": [
+    [
+      "§1.0 Creating Slides",
+      "§1.1 Placing Text",
+      "§1.2 Text Size and Font"
     ],
-    "articleCount": 12
+    [
+      "§2.0 Layout",
+      "§2.1 Aligning Positions",
+      "§2.2 Distribute Evenly",
+      "§2.3 Adding Margins"
+    ],
+    [
+      "§3.0 Using Figures and Graphs",
+      "§3.1 Icons"
+    ],
+    [
+      "§4.0 Summarizing",
+      "§4.1 Summary of a Sample Paper",
+      "§4.1 Sample Paper Slides (Answer)"
+    ]
+  ],
+  "articleCount": 12
 }

@@ -1,7 +1,5 @@
-import React from "react";
 import { ProbBtn } from "@/components/common/Btn";
 import { Box, Icon } from "@/styles";
-import Breadcrumb from "./Breadcrumb";
 
 /** 記事ヘッダー部分 */
 export default function ArticleHead({
@@ -13,10 +11,17 @@ export default function ArticleHead({
     showProblem,
 }) {
     return (
-        <Box mb={32} bg='lilac' py={32} px={44} borderRadius={10} position='relative'>
+        <Box
+            mb={32}
+            py={32}
+            px={44}
+            bg='lilac2'
+            borderRadius='10px 10px 0 0'
+            position='relative'
+            borderBottom='1px solid #E5E5E5'>
             {showProblemBtn && <ProbBtn toggle={showProblem} onClick={onClick} />}
             <Box>
-                <Breadcrumb bookName={bookSlug} chapter={articleSlug} />
+                {/* <Breadcrumb bookName={bookSlug} chapter={articleSlug} /> */}
                 <Box
                     fontSize={24}
                     color='shark'
