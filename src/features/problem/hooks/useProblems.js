@@ -1,5 +1,6 @@
-import { addCodeToNotion } from "@/components/notion/actions";
 import { useAuth } from "@/contexts/AuthContext";
+import { useBookConfig } from "@/contexts/BookConfigContext";
+import { addCodeToNotion } from "@/utils/notion/actions";
 import { useEffect, useMemo, useState } from "react";
 import markdownHtml from "zenn-markdown-html";
 import { parseProblemContent } from "../utils/parseProblemContent";
@@ -7,6 +8,8 @@ import { parseProblemContent } from "../utils/parseProblemContent";
 export function useProblems(problemMarkdown, articleSlug, bookSlug) {
     // Markdown→HTML
     const problemHtml = useMemo(() => markdownHtml(problemMarkdown), [problemMarkdown]);
+    const config = useBookConfig();
+    const language = config["language"] || "javascript";
 
     // <h1> 要素配列
     const headers = useMemo(() => {
@@ -56,6 +59,7 @@ export function useProblems(problemMarkdown, articleSlug, bookSlug) {
                 code: codes[i],
                 name: (user && user.displayName) || localStorage.getItem("kenji_name") || "",
                 index: i + 1,
+                language,
                 articleSlug,
                 bookSlug,
             });

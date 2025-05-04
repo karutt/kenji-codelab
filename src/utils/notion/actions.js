@@ -54,7 +54,7 @@ export async function addCodeToNotion(data) {
                     type: "code",
                     code: {
                         rich_text: [{ type: "text", text: { content: data.code } }],
-                        language: "javascript",
+                        language: data.language,
                         caption: [],
                     },
                 },

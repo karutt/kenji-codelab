@@ -1,5 +1,5 @@
+import { fetchSubmissions } from "@/utils/notion/actions"; // Notion APIを呼び出す関数
 import { NextResponse } from "next/server";
-import { fetchSubmissions } from "@/components/notion/actions"; // Notion APIを呼び出す関数
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
