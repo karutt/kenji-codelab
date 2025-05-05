@@ -1,6 +1,7 @@
 "use client";
 import { Card } from "@/components/common/Card";
 import { Box, Icon } from "@/styles";
+
 import Link from "next/link";
 
 const Lessons = ({ configs }) => {
@@ -23,7 +24,9 @@ const Lessons = ({ configs }) => {
                         教科書一覧
                     </Box>
                     <Box maxWidth={600} textAlign='center'>
-                        情報の授業で学ぶレッスンを一覧。スライド作成やプログラミングなど、実践的なスキルを身につけるための初心者向けの入門コースがあります。{" "}
+                        情報の授業で学ぶレッスンを一覧。スライド作成やプログラミングなど、
+                        <br />
+                        初心者向けの入門コースを用意しています。
                     </Box>
                 </Box>
 
@@ -74,6 +77,7 @@ const LessonCard = ({ config }) => {
                             alignItems='center'
                             justifyContent='center'
                             flexDirection='column'
+                            minWidth={200}
                             gap={12}>
                             <Box fontSize={24} fontWeight='bold'>
                                 {config["subTitle"]}
@@ -81,7 +85,7 @@ const LessonCard = ({ config }) => {
                             <Box fontSize={14} fontWeight='normal' lineHeight={1.7}>
                                 {config["description"]}
                             </Box>
-                            <Box fontSize={14} fontWeight='bold' lineHeight={1.7} color='hitGray'>
+                            <Box fontSize={14} fontWeight='normal' lineHeight={1.7} color='hitGray'>
                                 記事数{config["articleCount"]}　{config["estimatedTime"]}
                             </Box>
                         </Box>

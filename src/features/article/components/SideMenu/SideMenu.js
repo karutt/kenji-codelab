@@ -8,6 +8,7 @@ import { useSideMenu } from "./SideMenuContext";
 import SideMenuHead from "./SideMenuHead";
 export default function SideMenu({ bookName, articleSlug }) {
     const { showSideMenu } = useSideMenu();
+    console.log("bookName", bookName);
 
     return (
         <Box

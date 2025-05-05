@@ -10,7 +10,7 @@ export default function Navigation({ pathname, user, loading }) {
     ];
     // ログイン済みならChatを追加
     if (!loading && user) {
-        links.push({ name: "Chat", url: "/chat/home" });
+        links.push({ name: "Chat", url: "/chat/global" });
     }
 
     return (

@@ -22,6 +22,13 @@ export default function Page() {
         })
         .filter((config) => !config.slug.endsWith("_en"));
 
+    // configsの要素の辞書型にある"n"がキーの数字順でソートする
+    configs.sort((a, b) => {
+        const aNum = Number(a.n);
+        const bNum = Number(b.n);
+        return aNum - bNum;
+    });
+
     return (
         <div className='books'>
             <Lessons configs={configs} />

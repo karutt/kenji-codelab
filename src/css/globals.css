@@ -15,8 +15,9 @@ a:hover {
 }
 
 .znc .main {
-    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans",
-        Meiryo, sans-serif, "Segoe UI Emoji" !important;
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo,
+        sans-serif, "Segoe UI Emoji" !important;
 }
 
 h1,
@@ -41,8 +42,19 @@ h6 {
     opacity: 1 !important;
 }
 
-.books img {
+/* .books img {
     border: solid 4px #f3f5fb;
+} */
+.books img[src$="human1.png"] {
+    /* スタイル */
+    border: none;
+}
+
+.msg.message {
+    background-color: #eff6ff !important;
+}
+.znc .msg-symbol {
+    background-color: #60a5fa !important;
 }
 
 .copy-button {

@@ -9,6 +9,7 @@ import {
     Heading,
     Input,
     Separator,
+    Spinner,
     Stack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -90,6 +91,15 @@ export default function ProfileForm() {
 
                 <Button type='submit' colorScheme='blue' isLoading={loading} w='full' mt={3}>
                     更新する
+                    {loading && (
+                        <Spinner
+                            ml={2}
+                            thickness='4px'
+                            speed='0.65s'
+                            emptyColor='gray.200'
+                            size='sm'
+                        />
+                    )}
                 </Button>
 
                 <Separator my={4} />
