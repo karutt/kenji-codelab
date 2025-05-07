@@ -1,14 +1,14 @@
 // src/components/SideMenu/SideMenu.js
 "use client";
 
-import { SideMenuCard, SideMenuHeadCard } from "@/components/common/Card";
+import { SideMenuHeadCard } from "@/components/common/Card";
 import { Box } from "@/styles";
+import SideMenuCard from "./SideMeneCard";
 import SideMenuBody from "./SideMenuBody";
 import { useSideMenu } from "./SideMenuContext";
 import SideMenuHead from "./SideMenuHead";
 export default function SideMenu({ bookName, articleSlug }) {
     const { showSideMenu } = useSideMenu();
-    console.log("bookName", bookName);
 
     return (
         <Box

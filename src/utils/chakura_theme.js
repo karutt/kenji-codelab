@@ -24,6 +24,7 @@ const config = defineConfig({
                     zennBlue: { value: "#EDF2F6" },
                     green: { value: "#28a745" },
                     e2: { value: "#E2E8F0" },
+                    black12: { value: "rgba(0, 0, 0, 0.125)" },
                 },
             },
             fonts: {

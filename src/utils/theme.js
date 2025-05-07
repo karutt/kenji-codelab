@@ -20,7 +20,7 @@ export const theme = {
         blue: "#3755BE",
         shark: "#212529",
         lilac: "#F3F5FB",
-        lilac2: "#F6FBFCFF",
+        lilac2: "#f6f9fc",
         hitGray: "#ADB5BD",
         blue75: "rgba(55, 85, 190, 0.75)",
         geyser: "#DEE2E6",
