@@ -7,6 +7,7 @@ import Link from "next/link";
 
 export default function SideMenuHead({ bookName }) {
     const config = useBookConfig();
+    const bookNameWithoutLang = bookName.endsWith("_en") ? bookName.slice(0, -3) : bookName;
 
     return (
         <Box
@@ -18,7 +19,7 @@ export default function SideMenuHead({ bookName }) {
             borderRadius={10}>
             <Link href={`/books/${bookName}`}>
                 <Box display='flex' alignItems='center' gap={12}>
-                    <Icon name={`${bookName}_icon`} width={48} height='100%' />
+                    <Icon name={`${bookNameWithoutLang}_icon`} width={48} height='100%' />
                     <Box>
                         <Box fontSize={18} fontWeight='500' color='shark'>
                             {config.subTitle}

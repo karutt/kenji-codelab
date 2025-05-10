@@ -1,9 +1,8 @@
 "use client";
-import Link from "next/link";
-import { Box } from "@/styles";
 import { Card } from "@/components/common/Card";
-import CardHead from "./CardHead";
+import { Box } from "@/styles";
 import CardBody from "./CardBody";
+import CardHead from "./CardHead";
 
 export default function SectionList({ bookList, bookName }) {
     return (
