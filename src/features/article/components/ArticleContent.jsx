@@ -17,7 +17,6 @@ import { parseMarkdownToHtml } from "../utils/markdownParser";
 import ArticleHead from "./ArticleHead";
 import NameModal from "./NameModal";
 import NeighborLinkCard from "./NeighborLinkCard";
-
 export default function ArticleContent({
     markdown,
     card,
@@ -102,7 +101,7 @@ export default function ArticleContent({
                     showProblem={showProblem}
                     onClick={toggleProblemView}
                 />
-                <Box className='main' px={64} pb={64}>
+                <Box className='main' px={[16, "5%", 64]} pb={64}>
                     {showCard ? (
                         <CardSet cardMarkdown={card} />
                     ) : showProblem ? (
