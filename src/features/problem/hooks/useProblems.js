@@ -1,3 +1,4 @@
+import { toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBookConfig } from "@/contexts/BookConfigContext";
 import { addCodeToNotion } from "@/utils/notion/actions";
@@ -53,19 +54,34 @@ export function useProblems(problemMarkdown, articleSlug, bookSlug) {
             return next;
         });
 
+        const promise = addCodeToNotion({
+            title: `問題 ${i + 1}`,
+            code: codes[i],
+            name: (user && user.displayName) || localStorage.getItem("kenji_name") || "",
+            index: i + 1,
+            language,
+            articleSlug,
+            bookSlug,
+        });
+
+        toaster.promise(promise, {
+            loading: {
+                title: `問題 ${i + 1} を提出中...`,
+                description: "しばらくお待ちください",
+            },
+            success: {
+                title: `問題 ${i + 1} の提出が完了しました！`,
+                description: "解答が正常に提出されました。",
+                duration: 4000, // 6秒表示
+            },
+            error: {
+                title: `問題 ${i + 1} の提出に失敗しました。`,
+                description: "",
+            },
+        });
+
         try {
-            await addCodeToNotion({
-                title: `問題 ${i + 1}`,
-                code: codes[i],
-                name: (user && user.displayName) || localStorage.getItem("kenji_name") || "",
-                index: i + 1,
-                language,
-                articleSlug,
-                bookSlug,
-            });
-            alert(`問題 ${i + 1} 提出完了！`);
-        } catch {
-            alert("提出失敗…");
+            await promise;
         } finally {
             setLoading((prev) => {
                 const next = [...prev];

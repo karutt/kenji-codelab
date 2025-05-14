@@ -1,4 +1,4 @@
-import { Button, Spinner } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 import { parseProblemContent } from "../utils/parseProblemContent";
 import CodeEditorPanel from "./CodeEditorPanel";
 
@@ -21,7 +21,7 @@ export default function ProblemItem({ index, header, code, loading, onChange, on
                 w='100%'
                 fontSize='md'
                 colorScheme='blue'>
-                コードを提出 {loading ? <Spinner size='sm' /> : ""}
+                コードを提出
             </Button>
         </section>
     );
