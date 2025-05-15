@@ -91,7 +91,15 @@ export default function ArticleContent({
     const showProblemBtn = Boolean(problem);
 
     return (
-        <Box as='article' className='znc' color='shark' my={32} width='100%' maxWidth={860}>
+        <Box
+            as='article'
+            className='znc'
+            color='shark'
+            my={32}
+            width='100%'
+            maxWidth={860}
+            mr={[8, 12, 16]}
+            ml={[8, 12, 0]}>
             <ArticleCard>
                 <ArticleHead
                     frontMatter={frontMatter}
