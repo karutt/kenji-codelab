@@ -3,7 +3,6 @@
 import { Box, Button, CloseButton, Dialog, Input, Portal, Field } from "@chakra-ui/react";
 
 export default function NameModal({ isOpen, name, onChange, onSave, onCancel, error }) {
-    // フォームの onSubmit では e.preventDefault() してから onSave() を呼ぶ
     const handleSubmit = (e) => {
         e.preventDefault();
         onSave();
@@ -20,24 +19,21 @@ export default function NameModal({ isOpen, name, onChange, onSave, onCancel, er
             <Portal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                    <Dialog.Content p={6} width='100%' maxW='400px'>
+                    <Dialog.Content p={6} width='100%' maxW='480px'>
                         <Dialog.Header>
                             <Dialog.Title>
                                 <Box fontSize={24} fontWeight='bold'>
-                                    あなたの名前を入力
+                                    名前を入力してください
                                 </Box>
                             </Dialog.Title>
                         </Dialog.Header>
-
-                        {/* ここで <form> を追加 */}
                         <Box as='form' onSubmit={handleSubmit}>
                             <Dialog.Body>
                                 <Box color='brand.abbey' fontSize='sm' mb={4}>
-                                    「決定」を押すと問題が開始されます。
+                                    Enterキーまたは「決定」を押すと、問題が開始されます。
                                 </Box>
 
                                 <Field.Root invalid={!!error}>
-                                    {/* <Field.Label>名前</Field.Label> */}
                                     <Input
                                         type='text'
                                         fontSize='md'
@@ -48,14 +44,13 @@ export default function NameModal({ isOpen, name, onChange, onSave, onCancel, er
                                         }}
                                         value={name}
                                         onChange={(e) => onChange(e.target.value)}
-                                        placeholder='名前を入力'
+                                        placeholder='名前'
                                     />
                                     {error && <Field.ErrorText>{error}</Field.ErrorText>}
                                 </Field.Root>
                             </Dialog.Body>
 
                             <Dialog.Footer display='flex' flexDirection='column' gap={3}>
-                                {/* type="submit" にすることで Enter でも onSubmit が呼ばれる */}
                                 <Button
                                     type='submit'
                                     width='100%'
