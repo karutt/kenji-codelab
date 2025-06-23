@@ -1,31 +1,28 @@
 {
-  "title": "Python  Beginner's Course",
-  "subTitle": "Python入門",
-  "category": "python / raspberry pi",
-  "description": "An introductory course to learn basic Python syntax and how to use Raspberry Pi.",
-  "estimatedTime": "2 hours",
-  "language": "python",
-  "bookList": [
-    [
-      "§1.0 Running Python",
-      "§1.1 Preparing to Write Code",
-      "§1.2 Let's Try Jupyter Notebook",
-      "§1.3 Basic Jupyter Notebook Operations",
-      "§1.4 Learning Roadmap"
+    "title": "Python  Beginner's Course",
+    "subTitle": "Python入門",
+    "category": "python / raspberry pi",
+    "description": "An introductory course to learn basic Python syntax and how to use Raspberry Pi.",
+    "estimatedTime": "2 hours",
+    "language": "python",
+    "bookList": [
+        [
+            "§1.0 Running Python",
+            "§1.1 Preparing to Write Code",
+            "§1.2 Let's Try Jupyter Notebook",
+            "§1.3 Basic Jupyter Notebook Operations",
+            "§1.4 Learning Roadmap"
+        ],
+        [
+            "§2.0 Basics",
+            "§2.1 Variables and Data Types",
+            "§2.2 Operators and Expressions",
+            "§2.3 if Statements",
+            "§2.4 What Are Data Structures?",
+            "§2.5 Control Structures (for)"
+        ],
+        ["§3.0 Advanced", "§3.1 How to Use Functions"]
     ],
-    [
-      "§2.0 Basics",
-      "§2.1 Variables and Data Types",
-      "§2.2 Operators and Expressions",
-      "§2.3 if Statements",
-      "§2.4 What Are Data Structures?",
-      "§2.5 Control Structures (for)"
-    ],
-    [
-      "§3.0 Advanced",
-      "§3.1 How to Use Functions"
-    ]
-  ],
-  "articleCount": 13,
-  "n": 1
+    "articleCount": 13,
+    "n": 1
 }

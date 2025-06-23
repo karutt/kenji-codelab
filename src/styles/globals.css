@@ -1,0 +1,45 @@
+/* Global styles for KeNJi CodeLab */
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.problem-page h1 {
+    font-size: 1.4em;
+}
+/* Zenn content styles */
+/* .znc {
+    line-height: 1.7;
+}
+
+.znc h1,
+.znc h2,
+.znc h3,
+.znc h4,
+.znc h5,
+.znc h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+}
+
+.znc p {
+    margin-bottom: 1em;
+}
+
+.znc pre {
+    margin: 1.5em 0;
+    border-radius: 6px;
+}
+
+.znc code {
+    font-family: 'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+} */

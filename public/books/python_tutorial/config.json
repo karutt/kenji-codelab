@@ -1,32 +1,29 @@
 {
-  "title": "Python  Beginner's Course",
-  "subTitle": "Python入門",
-  "category": "python / raspberry pi",
-  "description": "Pythonを使い、基本文法やRaspberry Piの使い方を学ぶ入門講座",
-  "estimatedTime": "2 hours",
-  "language": "python",
-  "bookList": [
-    [
-      "§1.0 Pythonを動かす",
-      "§1.1 コードを書くための準備",
-      "§1.2 Jupyter Notebookを使ってみよう",
-      "§1.3 Jupyter Notebookの基本操作",
-      "§1.4 これからの学習の流れ"
+    "title": "Python  Beginner's Course",
+    "subTitle": "Python入門",
+    "category": "python / raspberry pi",
+    "description": "Pythonを使い、基本文法やRaspberry Piの使い方を学ぶ入門講座",
+    "estimatedTime": "2 hours",
+    "language": "python",
+    "bookList": [
+        [
+            "§1.0 Pythonを動かす",
+            "§1.1 コードを書くための準備",
+            "§1.2 Jupyter Notebookを使ってみよう",
+            "§1.3 Jupyter Notebookの基本操作",
+            "§1.4 これからの学習の流れ"
+        ],
+        [
+            "§2.0 基礎編",
+            "§2.1 変数とデータ型",
+            "§2.2 演算子と式",
+            "§2.3 if文",
+            "§2.4 データ構造とは",
+            "§2.5 制御構文（for）",
+            "§2.6 Python基礎まとめ"
+        ],
+        ["§3.0 応用編", "§3.1 関数の使い方"]
     ],
-    [
-      "§2.0 基礎編",
-      "§2.1 変数とデータ型",
-      "§2.2 演算子と式",
-      "§2.3 if文",
-      "§2.4 データ構造とは",
-      "§2.5 制御構文（for）",
-      "§2.6 Python基礎まとめ"
-    ],
-    [
-      "§3.0 応用編",
-      "§3.1 関数の使い方"
-    ]
-  ],
-  "articleCount": 14,
-  "n": 1
+    "articleCount": 14,
+    "n": 1
 }
