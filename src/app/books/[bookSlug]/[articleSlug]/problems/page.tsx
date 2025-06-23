@@ -1,8 +1,47 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { getArticleBySlug } from '@/features/article/api/articles';
+import { getAllArticles, getArticleBySlug } from '@/features/article/api/articles';
 import { ProblemPage } from '@/features/problem';
+
+interface PageProps {
+    params: Promise<{
+        bookSlug: string;
+        articleSlug: string;
+    }>;
+}
+
+/** SSG 用パラメータ生成 - problems ページ用 */
+export async function generateStaticParams() {
+    const fs = await import('fs');
+    const path = await import('path');
+    
+    // すべてのブックを取得
+    const dirPath = path.join(process.cwd(), 'public/books');
+    const bookSlugs = fs.readdirSync(dirPath).filter(file => {
+        return fs.statSync(path.join(dirPath, file)).isDirectory();
+    });
+    
+    const allParams: { bookSlug: string; articleSlug: string }[] = [];
+    
+    // 各ブックの記事を取得し、問題ファイルが存在するもののみを対象にする
+    bookSlugs.forEach(bookSlug => {
+        const articles = getAllArticles(bookSlug);
+        
+        articles.forEach(({ slug }) => {
+            // 問題ファイルが存在するかチェック
+            const probPath = path.join(process.cwd(), `public/books/${bookSlug}/prob`, `${slug}.md`);
+            if (fs.existsSync(probPath)) {
+                allParams.push({
+                    bookSlug,
+                    articleSlug: slug,
+                });
+            }
+        });
+    });
+    
+    return allParams;
+}
 
 interface PageProps {
     params: Promise<{
