@@ -7,19 +7,19 @@ import Article from '@/features/article/components/Article';
 export async function generateStaticParams() {
     const fs = await import('fs');
     const path = await import('path');
-    
+
     // すべてのブックを取得
     const dirPath = path.join(process.cwd(), 'public/books');
     const bookSlugs = fs.readdirSync(dirPath).filter(file => {
         return fs.statSync(path.join(dirPath, file)).isDirectory();
     });
-    
+
     const allParams: { bookSlug: string; articleSlug: string }[] = [];
-    
+
     // 各ブックの記事を取得
     bookSlugs.forEach(bookSlug => {
         const articles = getAllArticles(bookSlug);
-        
+
         articles.forEach(({ slug }) => {
             allParams.push({
                 bookSlug,
@@ -27,7 +27,7 @@ export async function generateStaticParams() {
             });
         });
     });
-    
+
     return allParams;
 }
 
