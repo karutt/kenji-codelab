@@ -86,14 +86,8 @@ export default function EditableField({
                 <Editable.Control>
                     <HStack gap={2}>
                         <Editable.SubmitTrigger asChild>
-                            <IconButton
-                                w="36px"
-                                bg="blackAlpha.800"
-                                _hover={{ bg: 'blackAlpha.700' }}
-                                size="sm"
-                                variant="surface"
-                            >
-                                <LuCheck style={{ stroke: 'white' }} />
+                            <IconButton w="36px" size="sm" variant="surface">
+                                <LuCheck />
                             </IconButton>
                         </Editable.SubmitTrigger>
                         <Editable.CancelTrigger asChild>

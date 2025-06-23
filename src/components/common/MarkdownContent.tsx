@@ -111,7 +111,10 @@ export function MarkdownContent({ content, hideTemplateBlocks = false }: Markdow
 
         // Group items by type and level
         const groups: Array<{ type: 'ordered' | 'unordered'; items: ListItem[] }> = [];
-        let currentGroup: { type: 'ordered' | 'unordered'; items: ListItem[] } | null = null;
+        let currentGroup: {
+            type: 'ordered' | 'unordered';
+            items: ListItem[];
+        } | null = null;
 
         for (const item of items) {
             if (!currentGroup || currentGroup.type !== item.type) {

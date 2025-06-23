@@ -134,7 +134,11 @@ export async function fetchSubmissions(
             Created: result.properties.Created?.created_time,
         }));
 
-        return { data, next_cursor: response.next_cursor, total: response.results.length };
+        return {
+            data,
+            next_cursor: response.next_cursor,
+            total: response.results.length,
+        };
     } catch (error) {
         console.error('Error fetching submissions from Notion:', error);
         throw error;

@@ -100,7 +100,7 @@ export default function Article({
                                 pb={1}
                                 color="brand.shark"
                                 fontSize="2xl"
-                                fontWeight="500"
+                                fontWeight="600"
                                 borderBottom="1px solid #E5E5E5"
                             >
                                 {frontMatter.title || 'Untitled'}

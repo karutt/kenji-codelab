@@ -160,7 +160,9 @@ const ChatMessageListSimple = forwardRef<ChatMessageListSimpleRef, ChatMessageLi
                                     (message.uid && user ? (
                                         <Avatar.Root size="sm" mt={6}>
                                             <Avatar.Fallback name={user.displayName} />
-                                            <Avatar.Image src={user.photoURL} />
+                                            {user.photoURL && user.photoURL.trim() && (
+                                                <Avatar.Image src={user.photoURL} />
+                                            )}
                                         </Avatar.Root>
                                     ) : (
                                         <Text>匿名:</Text>
@@ -208,7 +210,9 @@ const ChatMessageListSimple = forwardRef<ChatMessageListSimpleRef, ChatMessageLi
                                 {isOwn && message.uid && user && (
                                     <Avatar.Root size="sm" mt={6}>
                                         <Avatar.Fallback name={user.displayName} />
-                                        <Avatar.Image src={user.photoURL} />
+                                        {user.photoURL && user.photoURL.trim() && (
+                                            <Avatar.Image src={user.photoURL} />
+                                        )}
                                     </Avatar.Root>
                                 )}
                             </Stack>

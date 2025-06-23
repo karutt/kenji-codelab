@@ -11,7 +11,10 @@ interface CodeSubmissionRequest {
 }
 
 // In-memory storage for testing (would be replaced with actual database)
-const submissions: (CodeSubmissionRequest & { id: string; timestamp: string })[] = [];
+const submissions: (CodeSubmissionRequest & {
+    id: string;
+    timestamp: string;
+})[] = [];
 
 export async function POST(request: NextRequest) {
     try {
