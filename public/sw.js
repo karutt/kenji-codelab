@@ -1,8 +1,8 @@
-const CACHE_VERSION = 'v7';
-const CACHE_NAME = 'kenji-codelab-v7';
-const STATIC_CACHE_NAME = 'kenji-codelab-static-v7';
-const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v7';
-const IMAGE_CACHE_NAME = 'kenji-codelab-images-v7';
+const CACHE_VERSION = 'v9';
+const CACHE_NAME = 'kenji-codelab-v9';
+const STATIC_CACHE_NAME = 'kenji-codelab-static-v9';
+const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v9';
+const IMAGE_CACHE_NAME = 'kenji-codelab-images-v9';
 
 // 静的リソース（App Shell）- This will be replaced during build
 const STATIC_ASSETS = [
@@ -568,6 +568,11 @@ self.addEventListener('fetch', event => {
     const { request } = event;
     const url = new URL(request.url);
 
+    // 外部ドメインのリクエストは処理しない
+    if (url.origin !== self.location.origin) {
+        return;
+    }
+
     // GETリクエストのみを処理（OPTIONS、HEAD、POSTなどは除外）
     if (request.method !== 'GET') {
         return;
@@ -628,21 +633,54 @@ self.addEventListener('fetch', event => {
     // Next.jsのチャンク: Cache First, Network Fallback
     if (url.pathname.startsWith('/_next/static/')) {
         event.respondWith(
-            caches.match(request).then(cachedResponse => {
-                if (cachedResponse) {
-                    return cachedResponse;
-                }
-
-                return fetch(request).then(response => {
-                    if (response.ok) {
-                        const responseClone = response.clone();
-                        caches
-                            .open(STATIC_CACHE_NAME)
-                            .then(cache => cache.put(request, responseClone));
+            caches
+                .match(request)
+                .then(cachedResponse => {
+                    if (cachedResponse) {
+                        return cachedResponse;
                     }
-                    return response;
-                });
-            }),
+
+                    return fetch(request)
+                        .then(response => {
+                            if (response.ok) {
+                                const responseClone = response.clone();
+                                caches
+                                    .open(STATIC_CACHE_NAME)
+                                    .then(cache => cache.put(request, responseClone))
+                                    .catch(cacheError => {
+                                        console.log(
+                                            '[Service Worker] Failed to cache chunk:',
+                                            url.pathname,
+                                            cacheError,
+                                        );
+                                    });
+                            }
+                            return response;
+                        })
+                        .catch(error => {
+                            console.log(
+                                '[Service Worker] Failed to fetch Next.js chunk:',
+                                url.pathname,
+                                error,
+                            );
+                            // チャンクが見つからない場合は404を返す
+                            return new Response('', {
+                                status: 404,
+                                statusText: 'Not Found (Offline)',
+                            });
+                        });
+                })
+                .catch(cacheMatchError => {
+                    console.log(
+                        '[Service Worker] Cache match failed for chunk:',
+                        url.pathname,
+                        cacheMatchError,
+                    );
+                    return new Response('', {
+                        status: 404,
+                        statusText: 'Cache Error',
+                    });
+                }),
         );
         return;
     }
@@ -688,7 +726,8 @@ self.addEventListener('fetch', event => {
                         }
                         return response;
                     })
-                    .catch(() => {
+                    .catch(error => {
+                        console.log('[Service Worker] Failed to fetch font:', url.pathname, error);
                         // フォントが読み込めない場合は空のレスポンスを返す
                         return new Response('', { status: 404 });
                     });
