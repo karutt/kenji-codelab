@@ -7,6 +7,7 @@ declare global {
         __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
         caches: CacheStorage;
         addEventListener: (type: string, listener: EventListener) => void;
+        location: Location;
     }
 }
 
@@ -119,29 +120,60 @@ self.addEventListener('message', async (event: Event) => {
 
             console.log(`Service Worker: Caching ${urlsToCache.length} URLs`);
 
-            // URLを適切なキャッシュに分類して保存
-            for (const url of urlsToCache) {
-                try {
-                    if (/\.(png|jpg|jpeg|svg|gif|webp|ico)$/i.test(url)) {
-                        await imageCache.add(url);
-                    } else if (/\.md$/i.test(url)) {
-                        await articleContentCache.add(url);
-                    } else if (/\/_next\/static\//.test(url)) {
-                        await staticAssetsCache.add(url);
-                    } else {
-                        await pagesCache.add(url);
-                    }
-                } catch (error) {
-                    // 個別のURLキャッシュエラーは無視（404等）
-                    console.warn(`Failed to cache ${url}:`, error);
+            if (urlsToCache.length === 0) {
+                console.warn('Service Worker: No URLs to cache');
+                if (messageEvent.ports && messageEvent.ports[0]) {
+                    messageEvent.ports[0].postMessage({
+                        success: false,
+                        error: 'No URLs to cache',
+                    });
                 }
+                return;
             }
 
-            console.log('Service Worker: Cache installation complete');
+            let successCount = 0;
+            let errorCount = 0;
+
+            // バッチでキャッシュ処理（並列度を制限）
+            const batchSize = 5;
+            for (let i = 0; i < urlsToCache.length; i += batchSize) {
+                const batch = urlsToCache.slice(i, i + batchSize);
+
+                await Promise.allSettled(
+                    batch.map(async (url: string) => {
+                        try {
+                            // URLを正規化（絶対URLに変換）
+                            const fullUrl = new URL(url, self.location.origin).href;
+
+                            if (/\.(png|jpg|jpeg|svg|gif|webp|ico)$/i.test(url)) {
+                                await imageCache.add(fullUrl);
+                            } else if (/\.md$/i.test(url)) {
+                                await articleContentCache.add(fullUrl);
+                            } else if (/\/_next\/static\//.test(url)) {
+                                await staticAssetsCache.add(fullUrl);
+                            } else {
+                                await pagesCache.add(fullUrl);
+                            }
+                            successCount++;
+                            console.log(`Cached: ${fullUrl}`);
+                        } catch (error) {
+                            errorCount++;
+                            console.warn(`Failed to cache ${url}:`, error);
+                        }
+                    }),
+                );
+            }
+
+            console.log(
+                `Service Worker: Cache installation complete - Success: ${successCount}, Errors: ${errorCount}`,
+            );
 
             // 完了をクライアントに通知
             if (messageEvent.ports && messageEvent.ports[0]) {
-                messageEvent.ports[0].postMessage({ success: true });
+                messageEvent.ports[0].postMessage({
+                    success: true,
+                    stats: { successCount, errorCount, total: urlsToCache.length },
+                });
             }
         } catch (error) {
             console.error('Service Worker: Cache installation failed:', error);

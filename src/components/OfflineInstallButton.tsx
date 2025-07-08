@@ -78,6 +78,14 @@ export function OfflineInstallButton() {
             urls.push('/cache');
             urls.push('/offline');
 
+            // PWA関連ファイル
+            urls.push('/manifest.json');
+            urls.push('/sw.js');
+
+            // アイコンとアセット
+            urls.push('/web-app-manifest-192x192.png');
+            urls.push('/web-app-manifest-512x512.png');
+
             return [...new Set(urls)]; // 重複除去
         } catch (error) {
             console.error('Failed to get article URLs:', error);
@@ -86,14 +94,43 @@ export function OfflineInstallButton() {
     };
 
     // Service Workerにキャッシュリクエストを送信
-    const requestCacheUrls = async (urls: string[]) => {
-        if ('serviceWorker' in navigator) {
-            const registration = await navigator.serviceWorker.ready;
-            registration.active?.postMessage({
-                type: 'CACHE_URLS',
-                payload: { urlsToCache: urls },
-            });
+    const requestCacheUrls = async (
+        urls: string[],
+    ): Promise<{
+        success: boolean;
+        stats?: { successCount: number; errorCount: number; total: number };
+        error?: string;
+    }> => {
+        if (!('serviceWorker' in navigator)) {
+            throw new Error('Service Worker not supported');
         }
+
+        const registration = await navigator.serviceWorker.ready;
+        if (!registration.active) {
+            throw new Error('No active Service Worker');
+        }
+
+        return new Promise((resolve, reject) => {
+            const messageChannel = new MessageChannel();
+
+            // タイムアウト設定（30秒）
+            const timeout = setTimeout(() => {
+                reject(new Error('Service Worker response timeout'));
+            }, 30000);
+
+            messageChannel.port1.onmessage = event => {
+                clearTimeout(timeout);
+                resolve(event.data);
+            };
+
+            registration.active!.postMessage(
+                {
+                    type: 'CACHE_URLS',
+                    payload: { urlsToCache: urls },
+                },
+                [messageChannel.port2],
+            );
+        });
     };
 
     // プログレスバーコンポーネント
@@ -123,39 +160,61 @@ export function OfflineInstallButton() {
                 currentItem: `${urls.length}件のリソースを発見`,
             }));
 
-            // 2. バッチでキャッシュ処理
-            const batchSize = 10;
-            let completed = 0;
+            // 2. Service Workerでキャッシュ処理
+            setProgress(prev => ({
+                ...prev,
+                currentItem: 'Service Workerでキャッシュ中...',
+            }));
 
-            for (let i = 0; i < urls.length; i += batchSize) {
-                const batch = urls.slice(i, i + batchSize);
+            const result = await requestCacheUrls(urls);
 
-                setProgress(prev => ({
-                    ...prev,
-                    currentItem: `${Math.min(i + batchSize, urls.length)}/${urls.length} 処理中...`,
-                }));
-
-                // 並列でフェッチしてキャッシュ
-                await Promise.allSettled(
-                    batch.map(async url => {
-                        try {
-                            const response = await fetch(url);
-                            if (response.ok) {
-                                completed++;
-                                setProgress(prev => ({ ...prev, completed }));
-                            }
-                        } catch {
-                            // 404等のエラーは無視
-                        }
-                    }),
-                );
-
-                // UI更新のための少し待つ
-                await new Promise(resolve => setTimeout(resolve, 100));
+            if (!result.success) {
+                throw new Error(result.error || 'Service Worker caching failed');
             }
 
-            // 3. Service Workerにもキャッシュ指示
-            await requestCacheUrls(urls);
+            // 3. プリキャッシングの補完（フォールバック）
+            setProgress(prev => ({
+                ...prev,
+                currentItem: '追加リソースをプリキャッシュ中...',
+            }));
+
+            const batchSize = 10;
+            let completed = result.stats?.successCount || 0;
+
+            // 失敗したURLがある場合の補完処理
+            if (result.stats && result.stats.errorCount > 0) {
+                const failedUrls = urls.slice(result.stats.successCount);
+
+                for (let i = 0; i < failedUrls.length; i += batchSize) {
+                    const batch = failedUrls.slice(i, i + batchSize);
+
+                    setProgress(prev => ({
+                        ...prev,
+                        currentItem: `補完処理: ${Math.min(i + batchSize, failedUrls.length)}/${failedUrls.length}`,
+                    }));
+
+                    // 並列でフェッチしてキャッシュ
+                    await Promise.allSettled(
+                        batch.map(async url => {
+                            try {
+                                const response = await fetch(url);
+                                if (response.ok) {
+                                    completed++;
+                                    setProgress(prev => ({ ...prev, completed }));
+                                }
+                            } catch {
+                                // 404等のエラーは無視
+                            }
+                        }),
+                    );
+
+                    // UI更新のための少し待つ
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            } else {
+                // Service Workerで全て成功した場合
+                setProgress(prev => ({ ...prev, completed }));
+            }
 
             // 4. 完了
             setProgress(prev => ({
