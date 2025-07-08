@@ -14,7 +14,11 @@ const compat = new FlatCompat({
     baseDirectory: __dirname,
 });
 
-const eslintConfig = [
+export default [
+    // ファイル無視の設定
+    {
+        ignores: ['src/sw-template.js', 'scripts/**', 'public/sw.js', 'next.config.js'],
+    },
     ...compat.extends('next/core-web-vitals', 'next/typescript'),
     {
         files: ['**/*.{js,jsx,ts,tsx}'],
@@ -51,5 +55,3 @@ const eslintConfig = [
         },
     },
 ];
-
-export default eslintConfig;

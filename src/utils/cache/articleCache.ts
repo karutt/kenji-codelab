@@ -296,37 +296,13 @@ export const cleanupOldCache = async (): Promise<void> => {
 
 // 静的アセットのプリキャッシュ機能
 export const cacheStaticAssets = async (): Promise<{ success: number; failed: number }> => {
-    const commonAssets = [
-        '/svg/logo.svg',
-        '/svg/logo_text.svg',
-        '/svg/logo_text_v2.svg',
-        '/svg/mail.svg',
-        '/svg/line.svg',
-        '/svg/next.svg',
-        '/svg/book_list_bg.svg',
-        '/svg/book_list_bg2.svg',
-        '/svg/global_chat.svg',
-        '/svg/shark_shape.svg',
-        '/svg/red_shape.svg',
-        '/svg/white_shape.svg',
-        '/svg/x.svg',
-        // サムネイル画像
-        '/svg/p5_tutorial_thumnail.svg',
-        '/svg/python_tutorial_thumnail.svg',
-        '/svg/slide_design_thumnail.svg',
-        '/svg/p5_tutorial_en_thumnail.svg',
-        // その他のアイコン
-        '/svg/search.svg',
-        '/svg/toggle.svg',
-        '/svg/triangle.svg',
-        '/favicon.ico',
-        '/web-app-manifest-192x192.png',
-        '/web-app-manifest-512x512.png',
-        '/icons/icon0.svg',
-        '/icons/icon1.png',
-    ];
+    // Import the auto-generated asset list
+    const { COMMON_SVG_ASSETS, IMAGE_ASSETS } = await import('@/utils/cache/staticAssetList');
 
-    const results = await Promise.allSettled(commonAssets.map(url => cacheImage(url)));
+    // すべての静的アセットを結合
+    const allAssets = [...COMMON_SVG_ASSETS, ...IMAGE_ASSETS];
+
+    const results = await Promise.allSettled(allAssets.map(url => cacheImage(url)));
 
     const success = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
     const failed = results.length - success;

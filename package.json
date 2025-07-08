@@ -2,12 +2,15 @@
     "name": "kenji-codelab-2",
     "version": "0.1.0",
     "private": true,
+    "type": "module",
     "scripts": {
         "dev": "next dev --turbopack",
-        "build": "next build",
+        "build": "node scripts/generateAssetList.js && node scripts/generateServiceWorker.js && next build",
         "start": "next start",
         "lint": "next lint",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "generate:assets": "node scripts/generateAssetList.js",
+        "generate:sw": "node scripts/generateAssetList.js && node scripts/generateServiceWorker.js"
     },
     "dependencies": {
         "@chakra-ui/react": "^3.21.0",
