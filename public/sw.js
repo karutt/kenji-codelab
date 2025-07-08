@@ -1,7 +1,7 @@
-const CACHE_NAME = 'kenji-codelab-v3';
-const STATIC_CACHE_NAME = 'kenji-codelab-static-v3';
-const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v3';
-const IMAGE_CACHE_NAME = 'kenji-codelab-images-v3';
+const CACHE_NAME = 'kenji-codelab-v4';
+const STATIC_CACHE_NAME = 'kenji-codelab-static-v4';
+const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v4';
+const IMAGE_CACHE_NAME = 'kenji-codelab-images-v4';
 
 // 静的リソース（App Shell）- This will be replaced during build
 const STATIC_ASSETS = [
@@ -454,6 +454,14 @@ const STATIC_ASSETS = [
 
 ];
 
+// メッセージハンドラー（SKIP_WAITING対応）
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        console.log('[Service Worker] Received SKIP_WAITING message');
+        self.skipWaiting();
+    }
+});
+
 // Service Worker インストール
 self.addEventListener('install', event => {
     console.log('[Service Worker] Installing...');
@@ -506,37 +514,48 @@ self.addEventListener('activate', event => {
 
 // Next.jsのチャンクとページをキャッシュするヘルパー関数
 const cacheNextJsPage = (request, response) => {
-    if (!response || !response.ok) {
+    if (!response || !response.ok || request.method !== 'GET') {
         return;
     }
 
     const responseClone = response.clone();
     caches.open(STATIC_CACHE_NAME).then(cache => {
         cache.put(request, responseClone);
-        
+
         // HTMLページの場合、関連するNext.jsのチャンクを事前に取得してキャッシュ
         if (request.destination === 'document') {
-            responseClone.text().then(text => {
-                const matches = text.matchAll(/_next\/static\/chunks\/[^"]+/g);
-                const chunks = [...matches].map(m => m[0]);
-                if (chunks.length > 0) {
-                    console.log('[Service Worker] Found page chunks to cache:', chunks);
-                    const chunkUrls = chunks.map(chunk => new URL(chunk, self.location.origin).href);
-                    Promise.all(
-                        chunkUrls.map(url => 
-                            fetch(url)
-                                .then(resp => {
-                                    if (resp.ok) {
-                                        return cache.put(url, resp);
-                                    }
-                                })
-                                .catch(err => console.error('[Service Worker] Failed to cache chunk:', url, err))
-                        )
-                    );
-                }
-            }).catch(err => {
-                console.error('[Service Worker] Failed to parse HTML for chunks:', err);
-            });
+            responseClone
+                .text()
+                .then(text => {
+                    const matches = text.matchAll(/_next\/static\/chunks\/[^"]+/g);
+                    const chunks = [...matches].map(m => m[0]);
+                    if (chunks.length > 0) {
+                        console.log('[Service Worker] Found page chunks to cache:', chunks);
+                        const chunkUrls = chunks.map(
+                            chunk => new URL(chunk, self.location.origin).href,
+                        );
+                        Promise.all(
+                            chunkUrls.map(url =>
+                                fetch(url)
+                                    .then(resp => {
+                                        if (resp.ok) {
+                                            return cache.put(url, resp);
+                                        }
+                                    })
+                                    .catch(err =>
+                                        console.error(
+                                            '[Service Worker] Failed to cache chunk:',
+                                            url,
+                                            err,
+                                        ),
+                                    ),
+                            ),
+                        );
+                    }
+                })
+                .catch(err => {
+                    console.error('[Service Worker] Failed to parse HTML for chunks:', err);
+                });
         }
     });
 };
@@ -545,7 +564,12 @@ const cacheNextJsPage = (request, response) => {
 self.addEventListener('fetch', event => {
     const { request } = event;
     const url = new URL(request.url);
-    
+
+    // GETリクエストのみを処理（OPTIONS、HEAD、POSTなどは除外）
+    if (request.method !== 'GET') {
+        return;
+    }
+
     // リクエストのURLをログ（デバッグ用）
     // console.log('[Service Worker] Fetch:', request.url);
 
@@ -576,7 +600,7 @@ self.addEventListener('fetch', event => {
                 if (cachedResponse) {
                     return cachedResponse;
                 }
-                
+
                 return fetch(request).then(response => {
                     if (response.ok) {
                         const responseClone = response.clone();
@@ -666,7 +690,11 @@ self.addEventListener('fetch', event => {
     }
 
     // 静的リソース: Cache First
-    if (STATIC_ASSETS.includes(url.pathname) || url.pathname.includes('/svg/') || url.pathname.includes('/icons/')) {
+    if (
+        STATIC_ASSETS.includes(url.pathname) ||
+        url.pathname.includes('/svg/') ||
+        url.pathname.includes('/icons/')
+    ) {
         event.respondWith(
             caches.match(request).then(cachedResponse => {
                 if (cachedResponse) {
@@ -697,15 +725,14 @@ self.addEventListener('fetch', event => {
                 })
                 .catch(error => {
                     console.log('[Service Worker] Navigation fetch failed, trying cache:', error);
-                    return caches.match(request)
-                        .then(cachedResponse => {
-                            if (cachedResponse) {
-                                return cachedResponse;
-                            }
-                            // オフラインページを返す
-                            console.log('[Service Worker] No cached page found, serving offline page');
-                            return caches.match('/offline');
-                        });
+                    return caches.match(request).then(cachedResponse => {
+                        if (cachedResponse) {
+                            return cachedResponse;
+                        }
+                        // オフラインページを返す
+                        console.log('[Service Worker] No cached page found, serving offline page');
+                        return caches.match('/offline');
+                    });
                 }),
         );
         return;
@@ -715,8 +742,8 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         fetch(request)
             .then(response => {
-                // レスポンスが成功した場合のみキャッシュ
-                if (response && response.ok) {
+                // レスポンスが成功した場合かつGETリクエストの場合のみキャッシュ
+                if (response && response.ok && request.method === 'GET') {
                     const responseClone = response.clone();
                     caches.open(CACHE_NAME).then(cache => {
                         cache.put(request, responseClone);
@@ -730,14 +757,14 @@ self.addEventListener('fetch', event => {
                     if (cachedResponse) {
                         return cachedResponse;
                     }
-                    
+
                     // 画像リクエストには透明なGIFを返す
                     if (request.destination === 'image') {
                         const transparentGif =
                             'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
                         return fetch(transparentGif);
                     }
-                    
+
                     // その他のリクエストは404を返す
                     return new Response('Not Found', {
                         status: 404,

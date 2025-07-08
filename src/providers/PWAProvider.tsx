@@ -51,21 +51,27 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
             // 簡易な通知を表示（UIライブラリなしの場合）
             if (window.confirm('アプリの新しいバージョンがあります。今すぐ更新しますか？')) {
+                // Service Workerを強制的に更新
+                registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
                 window.location.reload();
             }
         };
 
         // Service Worker の更新を監視
-        registration.addEventListener('updatefound', () => {
+        const handleUpdateFound = () => {
             const newWorker = registration.installing;
             if (!newWorker) return;
 
-            newWorker.addEventListener('statechange', () => {
+            const handleStateChange = () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                     onUpdate();
                 }
-            });
-        });
+            };
+
+            newWorker.addEventListener('statechange', handleStateChange);
+        };
+
+        registration.addEventListener('updatefound', handleUpdateFound);
 
         // 定期的な更新チェック（30分ごと）
         const interval = setInterval(
@@ -77,7 +83,10 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
             30 * 60 * 1000,
         );
 
-        return () => clearInterval(interval);
+        return () => {
+            clearInterval(interval);
+            registration.removeEventListener('updatefound', handleUpdateFound);
+        };
     }, [registration]);
 
     return <>{children}</>;

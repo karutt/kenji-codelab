@@ -1,10 +1,18 @@
-const CACHE_NAME = 'kenji-codelab-v3';
-const STATIC_CACHE_NAME = 'kenji-codelab-static-v3';
-const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v3';
-const IMAGE_CACHE_NAME = 'kenji-codelab-images-v3';
+const CACHE_NAME = 'kenji-codelab-v4';
+const STATIC_CACHE_NAME = 'kenji-codelab-static-v4';
+const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v4';
+const IMAGE_CACHE_NAME = 'kenji-codelab-images-v4';
 
 // 静的リソース（App Shell）- This will be replaced during build
 const STATIC_ASSETS = __STATIC_ASSETS__;
+
+// メッセージハンドラー（SKIP_WAITING対応）
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        console.log('[Service Worker] Received SKIP_WAITING message');
+        self.skipWaiting();
+    }
+});
 
 // Service Worker インストール
 self.addEventListener('install', event => {
@@ -58,7 +66,7 @@ self.addEventListener('activate', event => {
 
 // Next.jsのチャンクとページをキャッシュするヘルパー関数
 const cacheNextJsPage = (request, response) => {
-    if (!response || !response.ok) {
+    if (!response || !response.ok || request.method !== 'GET') {
         return;
     }
 
@@ -108,6 +116,11 @@ const cacheNextJsPage = (request, response) => {
 self.addEventListener('fetch', event => {
     const { request } = event;
     const url = new URL(request.url);
+
+    // GETリクエストのみを処理（OPTIONS、HEAD、POSTなどは除外）
+    if (request.method !== 'GET') {
+        return;
+    }
 
     // リクエストのURLをログ（デバッグ用）
     // console.log('[Service Worker] Fetch:', request.url);
@@ -281,8 +294,8 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         fetch(request)
             .then(response => {
-                // レスポンスが成功した場合のみキャッシュ
-                if (response && response.ok) {
+                // レスポンスが成功した場合かつGETリクエストの場合のみキャッシュ
+                if (response && response.ok && request.method === 'GET') {
                     const responseClone = response.clone();
                     caches.open(CACHE_NAME).then(cache => {
                         cache.put(request, responseClone);
