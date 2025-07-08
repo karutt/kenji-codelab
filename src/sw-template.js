@@ -1,8 +1,8 @@
-const CACHE_VERSION = 'v9';
-const CACHE_NAME = 'kenji-codelab-v9';
-const STATIC_CACHE_NAME = 'kenji-codelab-static-v9';
-const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v9';
-const IMAGE_CACHE_NAME = 'kenji-codelab-images-v9';
+const CACHE_VERSION = 'v10';
+const CACHE_NAME = 'kenji-codelab-v10';
+const STATIC_CACHE_NAME = 'kenji-codelab-static-v10';
+const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v10';
+const IMAGE_CACHE_NAME = 'kenji-codelab-images-v10';
 
 // 静的リソース（App Shell）- This will be replaced during build
 const STATIC_ASSETS = __STATIC_ASSETS__;

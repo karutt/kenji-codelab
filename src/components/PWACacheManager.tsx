@@ -12,6 +12,7 @@ export const PWACacheManager = () => {
         progress,
         cacheStats,
         preloadAllBooks,
+        preloadPages,
         preloadStaticAssets,
         cleanup,
         updateCacheStats,
@@ -48,14 +49,62 @@ export const PWACacheManager = () => {
         }
 
         try {
+            // すべてを順次プリロード
+            showToast('全データのプリロードを開始します...', 'success');
+
+            // 1. ページをプリロード（HTMLとチャンク）
+            await preloadPages();
+
+            // 2. 記事コンテンツをプリロード
             await preloadAllBooks();
+
+            // 3. 静的アセットをプリロード
+            await preloadStaticAssets();
+
             showToast(
-                `プリロードが完了しました: ${progress.completedArticles}/${progress.totalArticles} 記事がキャッシュされました`,
+                `全プリロードが完了しました: ${progress.completedArticles}/${progress.totalArticles} 記事がキャッシュされました`,
                 'success',
             );
         } catch (error) {
             showToast(
                 `プリロードに失敗しました: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                'error',
+            );
+        }
+    };
+
+    const handlePreloadBooksOnly = async () => {
+        if (!isOnline) {
+            showToast('オフライン状態です。オンライン時に再度お試しください', 'warning');
+            return;
+        }
+
+        try {
+            await preloadAllBooks();
+            showToast(
+                `記事プリロードが完了しました: ${progress.completedArticles}/${progress.totalArticles} 記事がキャッシュされました`,
+                'success',
+            );
+        } catch (error) {
+            showToast(
+                `記事プリロードに失敗しました: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                'error',
+            );
+        }
+    };
+
+    const handlePreloadPages = async () => {
+        if (!isOnline) {
+            showToast('オフライン状態です。オンライン時に再度お試しください', 'warning');
+            return;
+        }
+
+        try {
+            await preloadPages();
+            showToast('ページのプリロードが完了しました', 'success');
+        } catch (error) {
+            showToast(
+                `ページのプリロードに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
                 'error',
             );
         }
@@ -250,14 +299,43 @@ export const PWACacheManager = () => {
                     <Stack gap={4}>
                         <Button
                             w="full"
-                            colorScheme="blue"
+                            colorScheme="green"
+                            size="lg"
                             disabled={!isOnline}
                             loading={progress.isLoading}
                             onClick={handlePreloadAll}
                         >
                             <FiDownload />
                             <Text ml={2}>
-                                {progress.isLoading ? 'プリロード中...' : '全記事をプリロード'}
+                                {progress.isLoading ? 'プリロード中...' : '全てをプリロード (推奨)'}
+                            </Text>
+                        </Button>
+
+                        <Box h="1px" bg="gray.300" />
+
+                        <Button
+                            w="full"
+                            colorScheme="blue"
+                            disabled={!isOnline}
+                            loading={progress.isLoading}
+                            onClick={handlePreloadBooksOnly}
+                        >
+                            <FiDownload />
+                            <Text ml={2}>
+                                {progress.isLoading ? 'プリロード中...' : '記事コンテンツのみ'}
+                            </Text>
+                        </Button>
+
+                        <Button
+                            w="full"
+                            colorScheme="purple"
+                            disabled={!isOnline}
+                            loading={progress.isLoading}
+                            onClick={handlePreloadPages}
+                        >
+                            <FiDownload />
+                            <Text ml={2}>
+                                {progress.isLoading ? 'プリロード中...' : 'ページをプリロード'}
                             </Text>
                         </Button>
 

@@ -145,6 +145,75 @@ export const usePWAPreload = () => {
         }
     };
 
+    // ページをプリロード（Service WorkerでHTMLとチャンクをキャッシュ）
+    const preloadPages = async () => {
+        if (!isOnline) {
+            console.warn('Cannot preload pages while offline');
+            return;
+        }
+
+        setProgress(prev => ({ ...prev, isLoading: true, errors: [] }));
+
+        try {
+            // 利用可能な書籍を取得
+            const response = await fetch('/api/articles?getBooks=true');
+            if (!response.ok) {
+                throw new Error('Failed to fetch books');
+            }
+            const books: string[] = await response.json();
+
+            const errors: string[] = [];
+            let successCount = 0;
+
+            // 各書籍のメインページをプリロード
+            for (const bookSlug of books) {
+                try {
+                    setProgress(prev => ({ ...prev, currentBook: bookSlug }));
+
+                    // 書籍のページを訪問（Service Workerでキャッシュされる）
+                    const pageResponse = await fetch(`/books/${bookSlug}`, {
+                        method: 'GET',
+                        headers: {
+                            Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        },
+                    });
+
+                    if (pageResponse.ok) {
+                        successCount++;
+                        console.log(`Successfully preloaded page: /books/${bookSlug}`);
+                    } else {
+                        errors.push(
+                            `Failed to preload page /books/${bookSlug}: ${pageResponse.statusText}`,
+                        );
+                    }
+                } catch (error) {
+                    errors.push(`Error preloading page /books/${bookSlug}: ${error}`);
+                    console.error(`Error preloading page /books/${bookSlug}:`, error);
+                }
+            }
+
+            setProgress(prev => ({
+                ...prev,
+                isLoading: false,
+                currentBook: null,
+                errors,
+            }));
+
+            console.log(`Pages preloaded: ${successCount}/${books.length}`);
+        } catch (error) {
+            console.error('Error preloading pages:', error);
+            setProgress(prev => ({
+                ...prev,
+                isLoading: false,
+                currentBook: null,
+                errors: [
+                    ...prev.errors,
+                    `Error preloading pages: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                ],
+            }));
+        }
+    };
+
     // 静的アセットをプリロード
     const preloadStaticAssets = async () => {
         if (!isOnline) {
@@ -197,6 +266,7 @@ export const usePWAPreload = () => {
         cacheStats,
         preloadAllBooks,
         preloadBook,
+        preloadPages,
         preloadStaticAssets,
         cleanup,
         updateCacheStats,
