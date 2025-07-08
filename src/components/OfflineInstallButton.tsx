@@ -12,6 +12,8 @@ interface InstallProgress {
     currentItem: string;
     isInstalling: boolean;
     isComplete: boolean;
+    errors?: number;
+    failedUrls?: string[];
 }
 
 // 記事と書籍の型定義
@@ -31,6 +33,8 @@ export function OfflineInstallButton() {
         currentItem: '',
         isInstalling: false,
         isComplete: false,
+        errors: 0,
+        failedUrls: [],
     });
     const [isInstalled, setIsInstalled] = useState(false);
 
@@ -48,6 +52,37 @@ export function OfflineInstallButton() {
         }
     };
 
+    // 実際に存在する画像ファイルを取得
+    const getExistingImages = async (books: Book[]): Promise<string[]> => {
+        try {
+            const bookSlugs = books.map(book => book.slug);
+            const response = await fetch('/api/images', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ books: bookSlugs }),
+            });
+
+            if (!response.ok) {
+                console.warn('Failed to fetch existing images, falling back to empty list');
+                return [];
+            }
+
+            const result: { books: Record<string, string[]> } = await response.json();
+            const allImages: string[] = [];
+
+            Object.values(result.books).forEach((images: string[]) => {
+                if (Array.isArray(images)) {
+                    allImages.push(...images);
+                }
+            });
+
+            return allImages;
+        } catch (error) {
+            console.error('Failed to get existing images:', error);
+            return [];
+        }
+    };
+
     // 全記事のURLを取得
     const getAllArticleUrls = async (): Promise<string[]> => {
         try {
@@ -62,15 +97,14 @@ export function OfflineInstallButton() {
                     urls.push(`/books/${book.slug}/${article.slug}`);
                     // 記事のMarkdownファイル
                     urls.push(`/books/${book.slug}/md/${article.slug}.md`);
-                    // 記事の画像（推定）
-                    for (let i = 1; i <= 10; i++) {
-                        urls.push(`/books/${book.slug}/images/${article.slug}/${i}.png`);
-                        urls.push(`/books/${book.slug}/images/${article.slug}/${i}.jpg`);
-                    }
                 });
                 // 書籍一覧ページ
                 urls.push(`/books/${book.slug}`);
             });
+
+            // 実際に存在する画像ファイルを取得
+            const existingImages = await getExistingImages(articles);
+            urls.push(...existingImages);
 
             // 重要なページ
             urls.push('/');
@@ -98,7 +132,12 @@ export function OfflineInstallButton() {
         urls: string[],
     ): Promise<{
         success: boolean;
-        stats?: { successCount: number; errorCount: number; total: number };
+        stats?: {
+            successCount: number;
+            errorCount: number;
+            total: number;
+            failedUrls?: string[];
+        };
         error?: string;
     }> => {
         if (!('serviceWorker' in navigator)) {
@@ -222,6 +261,9 @@ export function OfflineInstallButton() {
                 isInstalling: false,
                 isComplete: true,
                 currentItem: 'インストール完了！',
+                completed,
+                errors: result.stats?.errorCount || 0,
+                failedUrls: result.stats?.failedUrls || [],
             }));
 
             localStorage.setItem('offline-articles-installed', 'true');
@@ -259,6 +301,8 @@ export function OfflineInstallButton() {
             currentItem: '',
             isInstalling: false,
             isComplete: false,
+            errors: 0,
+            failedUrls: [],
         });
     };
 
@@ -308,14 +352,27 @@ export function OfflineInstallButton() {
                     </Text>
                     <Text color="gray.500" fontSize="xs" textAlign="center">
                         {progress.completed} / {progress.total} 完了
+                        {progress.errors && progress.errors > 0 && (
+                            <Text as="span" ml={2} color="orange.500">
+                                ({progress.errors} エラー)
+                            </Text>
+                        )}
                     </Text>
                 </VStack>
             )}
 
             {progress.isComplete && (
-                <Text color="green.500" fontSize="sm" fontWeight="bold" textAlign="center">
-                    ✅ 全ての記事がオフラインで利用可能になりました！
-                </Text>
+                <VStack align="stretch" gap={2}>
+                    <Text color="green.500" fontSize="sm" fontWeight="bold" textAlign="center">
+                        ✅ 全ての記事がオフラインで利用可能になりました！
+                    </Text>
+                    {progress.errors && progress.errors > 0 && (
+                        <Text color="orange.500" fontSize="xs" textAlign="center">
+                            ⚠️ {progress.errors}
+                            件のリソースでエラーが発生しましたが、記事の閲覧には影響ありません
+                        </Text>
+                    )}
+                </VStack>
             )}
 
             <Text color="gray.500" fontSize="xs">

@@ -133,13 +133,14 @@ self.addEventListener('message', async (event: Event) => {
 
             let successCount = 0;
             let errorCount = 0;
+            const failedUrls: string[] = [];
 
             // バッチでキャッシュ処理（並列度を制限）
             const batchSize = 5;
             for (let i = 0; i < urlsToCache.length; i += batchSize) {
                 const batch = urlsToCache.slice(i, i + batchSize);
 
-                await Promise.allSettled(
+                const batchResults = await Promise.allSettled(
                     batch.map(async (url: string) => {
                         try {
                             // URLを正規化（絶対URLに変換）
@@ -154,25 +155,48 @@ self.addEventListener('message', async (event: Event) => {
                             } else {
                                 await pagesCache.add(fullUrl);
                             }
-                            successCount++;
                             console.log(`Cached: ${fullUrl}`);
+                            return { url, success: true };
                         } catch (error) {
-                            errorCount++;
                             console.warn(`Failed to cache ${url}:`, error);
+                            return { url, success: false, error };
                         }
                     }),
                 );
+
+                // バッチ結果を集計
+                batchResults.forEach(result => {
+                    if (result.status === 'fulfilled') {
+                        if (result.value.success) {
+                            successCount++;
+                        } else {
+                            errorCount++;
+                            failedUrls.push(result.value.url);
+                        }
+                    } else {
+                        errorCount++;
+                    }
+                });
             }
 
             console.log(
                 `Service Worker: Cache installation complete - Success: ${successCount}, Errors: ${errorCount}`,
             );
 
+            if (failedUrls.length > 0) {
+                console.warn('Failed URLs:', failedUrls);
+            }
+
             // 完了をクライアントに通知
             if (messageEvent.ports && messageEvent.ports[0]) {
                 messageEvent.ports[0].postMessage({
                     success: true,
-                    stats: { successCount, errorCount, total: urlsToCache.length },
+                    stats: {
+                        successCount,
+                        errorCount,
+                        total: urlsToCache.length,
+                        failedUrls: failedUrls.slice(0, 10), // 最初の10個のみ
+                    },
                 });
             }
         } catch (error) {
