@@ -1,8 +1,8 @@
-const CACHE_VERSION = 'v11';
-const CACHE_NAME = 'kenji-codelab-v11';
-const STATIC_CACHE_NAME = 'kenji-codelab-static-v11';
-const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v11';
-const IMAGE_CACHE_NAME = 'kenji-codelab-images-v11';
+const CACHE_VERSION = 'v12';
+const CACHE_NAME = 'kenji-codelab-v12';
+const STATIC_CACHE_NAME = 'kenji-codelab-static-v12';
+const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v12';
+const IMAGE_CACHE_NAME = 'kenji-codelab-images-v12';
 
 // 静的リソース（App Shell）- This will be replaced during build
 const STATIC_ASSETS = __STATIC_ASSETS__;
@@ -22,12 +22,82 @@ self.addEventListener('message', event => {
 self.addEventListener('install', event => {
     console.log('[Service Worker] Installing...');
     event.waitUntil(
-        caches
-            .open(STATIC_CACHE_NAME)
-            .then(cache => {
+        Promise.all([
+            // 静的アセットをキャッシュ
+            caches.open(STATIC_CACHE_NAME).then(cache => {
                 console.log('[Service Worker] Caching static assets...');
                 return cache.addAll(STATIC_ASSETS);
-            })
+            }),
+
+            // 重要なページをプリキャッシュ（チャンクも含めて）
+            caches.open(STATIC_CACHE_NAME).then(cache => {
+                console.log('[Service Worker] Pre-caching critical pages...');
+                const criticalPages = ['/offline'];
+
+                return Promise.all(
+                    criticalPages.map(async pagePath => {
+                        try {
+                            console.log(`[Service Worker] Pre-caching page: ${pagePath}`);
+                            const response = await fetch(pagePath);
+                            if (response.ok) {
+                                // ページをキャッシュ
+                                await cache.put(pagePath, response.clone());
+
+                                // HTMLを解析してチャンクも取得・キャッシュ
+                                const text = await response.text();
+                                const chunkPatterns = [
+                                    /_next\/static\/chunks\/[^"'\s]+/g,
+                                    /_next\/static\/[^"'\s]+\.js/g,
+                                    /\/_next\/static\/chunks\/app\/[^"'\s]+\.js/g,
+                                ];
+
+                                const allChunks = new Set();
+                                chunkPatterns.forEach(pattern => {
+                                    const matches = text.matchAll(pattern);
+                                    [...matches].forEach(match => allChunks.add(match[0]));
+                                });
+
+                                const chunks = [...allChunks];
+                                if (chunks.length > 0) {
+                                    console.log(
+                                        `[Service Worker] Pre-caching chunks for ${pagePath}:`,
+                                        chunks,
+                                    );
+
+                                    await Promise.all(
+                                        chunks.map(async chunk => {
+                                            try {
+                                                const chunkUrl = new URL(
+                                                    chunk,
+                                                    self.location.origin,
+                                                ).href;
+                                                const chunkResponse = await fetch(chunkUrl);
+                                                if (chunkResponse.ok) {
+                                                    await cache.put(chunkUrl, chunkResponse);
+                                                    console.log(
+                                                        `[Service Worker] Pre-cached chunk: ${chunkUrl}`,
+                                                    );
+                                                }
+                                            } catch (err) {
+                                                console.warn(
+                                                    `[Service Worker] Failed to pre-cache chunk: ${chunk}`,
+                                                    err,
+                                                );
+                                            }
+                                        }),
+                                    );
+                                }
+                            }
+                        } catch (error) {
+                            console.warn(
+                                `[Service Worker] Failed to pre-cache page: ${pagePath}`,
+                                error,
+                            );
+                        }
+                    }),
+                );
+            }),
+        ])
             .then(() => {
                 console.log('[Service Worker] Installation complete, waiting for activation...');
                 // 自動的にskipWaitingしない - メッセージを受け取った時のみ
