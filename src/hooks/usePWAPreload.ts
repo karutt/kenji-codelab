@@ -156,7 +156,7 @@ export const usePWAPreload = () => {
 
         try {
             const result = await cacheStaticAssets();
-            
+
             setProgress(prev => ({
                 ...prev,
                 isLoading: false,
@@ -169,7 +169,10 @@ export const usePWAPreload = () => {
             setProgress(prev => ({
                 ...prev,
                 isLoading: false,
-                errors: [...prev.errors, `Error preloading static assets: ${error instanceof Error ? error.message : 'Unknown error'}`],
+                errors: [
+                    ...prev.errors,
+                    `Error preloading static assets: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                ],
             }));
         }
     };

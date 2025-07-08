@@ -8,8 +8,15 @@ import { usePWAPreload } from '@/hooks/usePWAPreload';
 import { clearCache } from '@/utils/cache/articleCache';
 
 export const PWACacheManager = () => {
-    const { progress, cacheStats, preloadAllBooks, preloadStaticAssets, cleanup, updateCacheStats, isOnline } =
-        usePWAPreload();
+    const {
+        progress,
+        cacheStats,
+        preloadAllBooks,
+        preloadStaticAssets,
+        cleanup,
+        updateCacheStats,
+        isOnline,
+    } = usePWAPreload();
 
     const [isClearing, setIsClearing] = useState(false);
 
@@ -263,7 +270,9 @@ export const PWACacheManager = () => {
                         >
                             <FiDownload />
                             <Text ml={2}>
-                                {progress.isLoading ? 'プリロード中...' : '静的アセットをプリロード'}
+                                {progress.isLoading
+                                    ? 'プリロード中...'
+                                    : '静的アセットをプリロード'}
                             </Text>
                         </Button>
 
