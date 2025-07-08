@@ -12,6 +12,12 @@ const STATIC_ASSETS = [
     '/manifest.json',
     '/web-app-manifest-192x192.png',
     '/web-app-manifest-512x512.png',
+    // 重要なSVGファイル
+    '/svg/logo.svg',
+    '/svg/logo_text.svg',
+    '/svg/p5_tutorial_thumnail.svg',
+    '/svg/python_tutorial_thumnail.svg',
+    '/svg/slide_design_thumnail.svg',
 ];
 
 // Service Worker インストール
@@ -67,6 +73,36 @@ self.addEventListener('fetch', event => {
                 .catch(() => {
                     return caches.match(request);
                 }),
+        );
+        return;
+    }
+
+    // フォント: Cache First
+    if (
+        url.pathname.includes('.woff') ||
+        url.pathname.includes('.woff2') ||
+        url.pathname.includes('.ttf')
+    ) {
+        event.respondWith(
+            caches.match(request).then(cachedResponse => {
+                if (cachedResponse) {
+                    return cachedResponse;
+                }
+                return fetch(request)
+                    .then(response => {
+                        if (response.ok) {
+                            const responseClone = response.clone();
+                            caches
+                                .open(STATIC_CACHE_NAME)
+                                .then(cache => cache.put(request, responseClone));
+                        }
+                        return response;
+                    })
+                    .catch(() => {
+                        // フォントが読み込めない場合は空のレスポンスを返す
+                        return new Response('', { status: 404 });
+                    });
+            }),
         );
         return;
     }
@@ -128,10 +164,16 @@ self.addEventListener('fetch', event => {
                     if (request.mode === 'navigate') {
                         return caches.match('/offline');
                     }
-                    // その他のリクエストは空のレスポンスを返す
-                    return new Response('', {
-                        status: 204,
-                        statusText: 'No Content (Offline)',
+                    // 画像リクエストには透明なGIFを返す
+                    if (request.destination === 'image') {
+                        const transparentGif =
+                            'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                        return fetch(transparentGif);
+                    }
+                    // その他のリクエストは404を返す
+                    return new Response('Not Found', {
+                        status: 404,
+                        statusText: 'Not Found (Offline)',
                     });
                 });
             }),

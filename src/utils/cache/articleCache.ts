@@ -310,6 +310,15 @@ export const cacheStaticAssets = async (): Promise<{ success: number; failed: nu
         '/svg/red_shape.svg',
         '/svg/white_shape.svg',
         '/svg/x.svg',
+        // サムネイル画像
+        '/svg/p5_tutorial_thumnail.svg',
+        '/svg/python_tutorial_thumnail.svg',
+        '/svg/slide_design_thumnail.svg',
+        '/svg/p5_tutorial_en_thumnail.svg',
+        // その他のアイコン
+        '/svg/search.svg',
+        '/svg/toggle.svg',
+        '/svg/triangle.svg',
         '/favicon.ico',
         '/web-app-manifest-192x192.png',
         '/web-app-manifest-512x512.png',
