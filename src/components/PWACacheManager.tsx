@@ -4,6 +4,7 @@ import { Box, Button, Heading, HStack, SimpleGrid, Stack, Text, VStack } from '@
 import { useState } from 'react';
 import { FiDownload, FiRefreshCw, FiTrash2, FiWifi, FiWifiOff } from 'react-icons/fi';
 
+import { OfflineInstallButton } from '@/components/OfflineInstallButton';
 import { usePWAPreload } from '@/hooks/usePWAPreload';
 import { clearCache } from '@/utils/cache/articleCache';
 
@@ -179,6 +180,17 @@ export const PWACacheManager = () => {
                     </HStack>
                 </Box>
 
+                {/* オフライン記事インストール */}
+                <Box p={6} bg="blue.50" border="1px" borderColor="blue.200" borderRadius="lg">
+                    <Heading mb={4} color="blue.800" size="md">
+                        📚 オフライン記事閲覧
+                    </Heading>
+                    <Text mb={4} color="blue.700" fontSize="sm">
+                        全ての記事と画像をダウンロードして、完全にオフラインで閲覧できるようにします。
+                    </Text>
+                    <OfflineInstallButton />
+                </Box>
+
                 {/* 統計情報 */}
                 <Box p={6} bg="white" border="1px" borderColor="gray.200" borderRadius="lg">
                     <Heading mb={4} size="md">
@@ -300,10 +312,10 @@ export const PWACacheManager = () => {
                         <Button
                             w="full"
                             colorScheme="green"
-                            size="lg"
                             disabled={!isOnline}
                             loading={progress.isLoading}
                             onClick={handlePreloadAll}
+                            size="lg"
                         >
                             <FiDownload />
                             <Text ml={2}>
