@@ -1,10 +1,14 @@
-const CACHE_NAME = 'kenji-codelab-v4';
-const STATIC_CACHE_NAME = 'kenji-codelab-static-v4';
-const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v4';
-const IMAGE_CACHE_NAME = 'kenji-codelab-images-v4';
+const CACHE_VERSION = 'v6';
+const CACHE_NAME = 'kenji-codelab-v6';
+const STATIC_CACHE_NAME = 'kenji-codelab-static-v6';
+const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v6';
+const IMAGE_CACHE_NAME = 'kenji-codelab-images-v6';
 
 // 静的リソース（App Shell）- This will be replaced during build
 const STATIC_ASSETS = __STATIC_ASSETS__;
+
+// 更新通知の状態管理
+let hasNotifiedUpdate = false;
 
 // メッセージハンドラー（SKIP_WAITING対応）
 self.addEventListener('message', event => {
@@ -25,8 +29,9 @@ self.addEventListener('install', event => {
                 return cache.addAll(STATIC_ASSETS);
             })
             .then(() => {
-                console.log('[Service Worker] Skip waiting...');
-                return self.skipWaiting();
+                console.log('[Service Worker] Installation complete, waiting for activation...');
+                // 自動的にskipWaitingしない - メッセージを受け取った時のみ
+                // return self.skipWaiting();
             })
             .catch(error => {
                 console.error('[Service Worker] Install failed:', error);
