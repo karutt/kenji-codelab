@@ -1,13 +1,14 @@
-const CACHE_NAME = 'kenji-codelab-v1';
-const STATIC_CACHE_NAME = 'kenji-codelab-static-v1';
-const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v1';
-const IMAGE_CACHE_NAME = 'kenji-codelab-images-v1';
+const CACHE_NAME = 'kenji-codelab-v2';
+const STATIC_CACHE_NAME = 'kenji-codelab-static-v2';
+const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v2';
+const IMAGE_CACHE_NAME = 'kenji-codelab-images-v2';
 
 // 静的リソース（App Shell）
 const STATIC_ASSETS = [
     '/',
     '/books',
     '/offline',
+    '/cache',
     '/manifest.json',
     '/web-app-manifest-192x192.png',
     '/web-app-manifest-512x512.png',
