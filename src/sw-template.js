@@ -1,8 +1,8 @@
-const CACHE_VERSION = 'v6';
-const CACHE_NAME = 'kenji-codelab-v6';
-const STATIC_CACHE_NAME = 'kenji-codelab-static-v6';
-const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v6';
-const IMAGE_CACHE_NAME = 'kenji-codelab-images-v6';
+const CACHE_VERSION = 'v7';
+const CACHE_NAME = 'kenji-codelab-v7';
+const STATIC_CACHE_NAME = 'kenji-codelab-static-v7';
+const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v7';
+const IMAGE_CACHE_NAME = 'kenji-codelab-images-v7';
 
 // 静的リソース（App Shell）- This will be replaced during build
 const STATIC_ASSETS = __STATIC_ASSETS__;
@@ -150,6 +150,35 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    // Next.jsのRSC（React Server Components）リクエスト: Network First, Cache Fallback
+    if (url.searchParams.has('_rsc')) {
+        event.respondWith(
+            fetch(request)
+                .then(response => {
+                    if (response.ok) {
+                        const responseClone = response.clone();
+                        caches
+                            .open(STATIC_CACHE_NAME)
+                            .then(cache => cache.put(request, responseClone));
+                    }
+                    return response;
+                })
+                .catch(() => {
+                    return caches.match(request).then(cachedResponse => {
+                        if (cachedResponse) {
+                            return cachedResponse;
+                        }
+                        // RSCリクエストが失敗した場合、空のJSONを返す
+                        return new Response('{}', {
+                            status: 200,
+                            headers: { 'Content-Type': 'application/json' },
+                        });
+                    });
+                }),
+        );
+        return;
+    }
+
     // Next.jsのチャンク: Cache First, Network Fallback
     if (url.pathname.startsWith('/_next/static/')) {
         event.respondWith(
@@ -246,6 +275,43 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    // Manifest と Web App Manifest: Cache First
+    if (url.pathname === '/manifest.json' || url.pathname === '/manifest.webmanifest') {
+        event.respondWith(
+            caches.match(request).then(cachedResponse => {
+                if (cachedResponse) {
+                    return cachedResponse;
+                }
+                return fetch(request)
+                    .then(response => {
+                        if (response.ok) {
+                            const responseClone = response.clone();
+                            caches
+                                .open(STATIC_CACHE_NAME)
+                                .then(cache => cache.put(request, responseClone));
+                        }
+                        return response;
+                    })
+                    .catch(() => {
+                        // Manifestが見つからない場合、最小限のマニフェストを返す
+                        const fallbackManifest = {
+                            name: 'Kenji Codelab',
+                            short_name: 'Kenji',
+                            start_url: '/',
+                            display: 'standalone',
+                            background_color: '#ffffff',
+                            theme_color: '#000000',
+                        };
+                        return new Response(JSON.stringify(fallbackManifest), {
+                            status: 200,
+                            headers: { 'Content-Type': 'application/json' },
+                        });
+                    });
+            }),
+        );
+        return;
+    }
+
     // 静的リソース: Cache First
     if (
         STATIC_ASSETS.includes(url.pathname) ||
@@ -315,6 +381,14 @@ self.addEventListener('fetch', event => {
                         return cachedResponse;
                     }
 
+                    // API リクエストの場合、空のJSONレスポンスを返す
+                    if (url.pathname.startsWith('/api/')) {
+                        return new Response('{}', {
+                            status: 200,
+                            headers: { 'Content-Type': 'application/json' },
+                        });
+                    }
+
                     // 画像リクエストには透明なGIFを返す
                     if (request.destination === 'image') {
                         const transparentGif =
@@ -322,7 +396,40 @@ self.addEventListener('fetch', event => {
                         return fetch(transparentGif);
                     }
 
-                    // その他のリクエストは404を返す
+                    // ページリクエストの場合、オフラインページを返す
+                    if (
+                        request.destination === 'document' ||
+                        request.headers.get('accept')?.includes('text/html')
+                    ) {
+                        return caches.match('/offline').then(offlinePage => {
+                            if (offlinePage) {
+                                return offlinePage;
+                            }
+                            // オフラインページもない場合、シンプルなHTMLを返す
+                            return new Response(
+                                `
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                    <title>オフライン</title>
+                                    <meta charset="utf-8">
+                                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                                </head>
+                                <body>
+                                    <h1>オフラインです</h1>
+                                    <p>インターネット接続を確認してください。</p>
+                                </body>
+                                </html>
+                            `,
+                                {
+                                    status: 200,
+                                    headers: { 'Content-Type': 'text/html' },
+                                },
+                            );
+                        });
+                    }
+
+                    // その他のリクエストは404を返すが、ログを抑制
                     return new Response('Not Found', {
                         status: 404,
                         statusText: 'Not Found (Offline)',
