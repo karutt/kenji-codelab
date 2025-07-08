@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "next dev --turbopack",
-        "build": "node scripts/generateAssetList.js && node scripts/generateServiceWorker.js && next build",
+        "build": "next build",
         "start": "next start",
         "lint": "next lint",
         "format": "prettier --write .",
@@ -16,6 +16,7 @@
         "@chakra-ui/react": "^3.21.0",
         "@emotion/react": "^11.14.0",
         "@notionhq/client": "^3.1.3",
+        "@serwist/next": "^9.0.15",
         "@tanstack/react-query": "^5.80.7",
         "date-fns": "^4.1.0",
         "firebase": "^11.9.1",
@@ -38,6 +39,7 @@
         "rehype-highlight": "^7.0.2",
         "remark": "^15.0.1",
         "remark-gfm": "^4.0.1",
+        "serwist": "^9.0.15",
         "zenn-content-css": "^0.1.161",
         "zenn-markdown-html": "^0.1.161",
         "zod": "^3.25.67"

@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PWA機能テスト - kenji-codelab</title>
+        <style>
+            body {
+                font-family: system-ui, sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .status-ok {
+                color: green;
+            }
+            .status-error {
+                color: red;
+            }
+            .status-warning {
+                color: orange;
+            }
+            .test-section {
+                margin: 20px 0;
+                padding: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+            }
+            button {
+                padding: 10px 15px;
+                margin: 5px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            .btn-primary {
+                background: #007bff;
+                color: white;
+            }
+            .btn-secondary {
+                background: #6c757d;
+                color: white;
+            }
+            #results {
+                white-space: pre-wrap;
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 4px;
+                font-family: monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>🔍 PWA機能テスト - Serwist版</h1>
+
+        <div class="test-section">
+            <h2>1. Service Worker状態</h2>
+            <div id="sw-status"></div>
+            <button class="btn-primary" onclick="checkServiceWorker()">Service Worker確認</button>
+        </div>
+
+        <div class="test-section">
+            <h2>2. キャッシュ状態</h2>
+            <div id="cache-status"></div>
+            <button class="btn-primary" onclick="checkCaches()">キャッシュ確認</button>
+            <button class="btn-secondary" onclick="listCacheContents()">キャッシュ内容詳細</button>
+        </div>
+
+        <div class="test-section">
+            <h2>3. オフライン機能テスト</h2>
+            <div id="offline-status"></div>
+            <p>📍 ネットワーク状態: <span id="network-status"></span></p>
+            <button class="btn-primary" onclick="testOfflineResources()">
+                オフラインリソーステスト
+            </button>
+            <p>
+                <small
+                    >※ Chrome
+                    DevToolsのNetworkタブで「Offline」にチェックしてからテストしてください</small
+                >
+            </p>
+        </div>
+
+        <div class="test-section">
+            <h2>4. 包括的テスト結果</h2>
+            <button class="btn-primary" onclick="runComprehensiveTest()">全体テスト実行</button>
+            <pre id="results"></pre>
+        </div>
+
+        <script>
+            // ネットワーク状態の監視
+            function updateNetworkStatus() {
+                const status = navigator.onLine ? '🌐 オンライン' : '📴 オフライン';
+                document.getElementById('network-status').textContent = status;
+            }
+
+            window.addEventListener('online', updateNetworkStatus);
+            window.addEventListener('offline', updateNetworkStatus);
+            updateNetworkStatus();
+
+            // Service Worker確認
+            async function checkServiceWorker() {
+                const statusDiv = document.getElementById('sw-status');
+
+                if (!('serviceWorker' in navigator)) {
+                    statusDiv.innerHTML =
+                        '<p class="status-error">❌ Service Worker非対応ブラウザです</p>';
+                    return;
+                }
+
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    if (registration) {
+                        const state = registration.active?.state || 'unknown';
+                        statusDiv.innerHTML = `
+                        <p class="status-ok">✅ Service Worker登録済み</p>
+                        <p>スコープ: ${registration.scope}</p>
+                        <p>状態: ${state}</p>
+                        <p>スクリプトURL: ${registration.active?.scriptURL || 'N/A'}</p>
+                    `;
+                    } else {
+                        statusDiv.innerHTML = '<p class="status-error">❌ Service Worker未登録</p>';
+                    }
+                } catch (error) {
+                    statusDiv.innerHTML = `<p class="status-error">❌ エラー: ${error.message}</p>`;
+                }
+            }
+
+            // キャッシュ確認
+            async function checkCaches() {
+                const statusDiv = document.getElementById('cache-status');
+
+                try {
+                    const cacheNames = await caches.keys();
+                    if (cacheNames.length > 0) {
+                        const serwistCaches = cacheNames.filter(
+                            name =>
+                                name.includes('serwist') ||
+                                [
+                                    'images',
+                                    'article-images',
+                                    'fonts',
+                                    'pages',
+                                    'api-cache',
+                                    'article-content',
+                                ].includes(name),
+                        );
+
+                        statusDiv.innerHTML = `
+                        <p class="status-ok">✅ ${cacheNames.length}個のキャッシュが利用可能</p>
+                        <p>Serwist関連: ${serwistCaches.length}個</p>
+                        <ul>${cacheNames.map(name => `<li>${name}</li>`).join('')}</ul>
+                    `;
+                    } else {
+                        statusDiv.innerHTML =
+                            '<p class="status-warning">⚠️ キャッシュが見つかりません</p>';
+                    }
+                } catch (error) {
+                    statusDiv.innerHTML = `<p class="status-error">❌ エラー: ${error.message}</p>`;
+                }
+            }
+
+            // キャッシュ内容詳細
+            async function listCacheContents() {
+                try {
+                    const cacheNames = await caches.keys();
+                    let content = 'キャッシュ内容詳細:\n\n';
+
+                    for (const cacheName of cacheNames) {
+                        const cache = await caches.open(cacheName);
+                        const keys = await cache.keys();
+                        content += `📁 ${cacheName} (${keys.length}件)\n`;
+                        content += keys
+                            .slice(0, 5)
+                            .map(req => `  - ${req.url}`)
+                            .join('\n');
+                        if (keys.length > 5) content += `\n  ... 他${keys.length - 5}件`;
+                        content += '\n\n';
+                    }
+
+                    document.getElementById('results').textContent = content;
+                } catch (error) {
+                    document.getElementById('results').textContent = `エラー: ${error.message}`;
+                }
+            }
+
+            // オフラインリソーステスト
+            async function testOfflineResources() {
+                const statusDiv = document.getElementById('offline-status');
+                const testUrls = [
+                    '/',
+                    '/books',
+                    '/books/p5_tutorial/1-0',
+                    '/books/p5_tutorial/images/1-0/1.png',
+                    '/_next/static/chunks/framework-b9bc70a31e6f8a8a.js',
+                ];
+
+                let results = '🧪 オフラインリソーステスト結果:\n\n';
+
+                for (const url of testUrls) {
+                    try {
+                        const cachedResponse = await caches.match(url);
+                        const status = cachedResponse ? '✅ キャッシュ済み' : '❌ 未キャッシュ';
+                        results += `${status} ${url}\n`;
+                    } catch (error) {
+                        results += `❌ エラー ${url}: ${error.message}\n`;
+                    }
+                }
+
+                statusDiv.innerHTML = `<pre>${results}</pre>`;
+            }
+
+            // 包括的テスト
+            async function runComprehensiveTest() {
+                const results = document.getElementById('results');
+                results.textContent = '🔍 包括的PWAテスト実行中...\n\n';
+
+                let report = '';
+
+                // 1. Service Worker確認
+                report += '=== Service Worker ===\n';
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    report += registration ? '✅ 登録済み\n' : '❌ 未登録\n';
+                    if (registration) {
+                        report += `   状態: ${registration.active?.state}\n`;
+                        report += `   スコープ: ${registration.scope}\n`;
+                    }
+                } catch (error) {
+                    report += `❌ エラー: ${error.message}\n`;
+                }
+
+                // 2. キャッシュ確認
+                report += '\n=== キャッシュ ===\n';
+                try {
+                    const cacheNames = await caches.keys();
+                    report += `キャッシュ数: ${cacheNames.length}\n`;
+
+                    const expectedCaches = [
+                        'images',
+                        'article-images',
+                        'fonts',
+                        'pages',
+                        'api-cache',
+                        'article-content',
+                    ];
+                    for (const expected of expectedCaches) {
+                        const exists = cacheNames.some(name => name.includes(expected));
+                        report += `${exists ? '✅' : '❌'} ${expected}\n`;
+                    }
+
+                    // プリキャッシュ確認
+                    const precacheNames = cacheNames.filter(name => name.includes('precache'));
+                    if (precacheNames.length > 0) {
+                        const cache = await caches.open(precacheNames[0]);
+                        const keys = await cache.keys();
+                        report += `✅ プリキャッシュ: ${keys.length}件\n`;
+                    }
+                } catch (error) {
+                    report += `❌ エラー: ${error.message}\n`;
+                }
+
+                // 3. 重要リソースの確認
+                report += '\n=== 重要リソース ===\n';
+                const criticalUrls = ['/', '/books', '/sw.js', '/manifest.json'];
+
+                for (const url of criticalUrls) {
+                    try {
+                        const response = await caches.match(url);
+                        report += `${response ? '✅' : '❌'} ${url}\n`;
+                    } catch (error) {
+                        report += `❌ ${url}: ${error.message}\n`;
+                    }
+                }
+
+                // 4. 総合評価
+                report += '\n=== 総合評価 ===\n';
+                const registration = await navigator.serviceWorker.getRegistration();
+                const cacheNames = await caches.keys();
+                const hasPrecache = cacheNames.some(name => name.includes('precache'));
+
+                if (registration && cacheNames.length > 0 && hasPrecache) {
+                    report += '🎉 PWA機能は正常に動作しています！\n';
+                    report += '✅ オフライン閲覧が可能です\n';
+                } else {
+                    report += '⚠️ 一部機能に問題があります\n';
+                    if (!registration) report += '- Service Worker未登録\n';
+                    if (cacheNames.length === 0) report += '- キャッシュなし\n';
+                    if (!hasPrecache) report += '- プリキャッシュなし\n';
+                }
+
+                results.textContent = report;
+            }
+
+            // 初期化
+            document.addEventListener('DOMContentLoaded', () => {
+                checkServiceWorker();
+                checkCaches();
+            });
+        </script>
+    </body>
+</html>

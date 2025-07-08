@@ -17,7 +17,7 @@ const compat = new FlatCompat({
 export default [
     // ファイル無視の設定
     {
-        ignores: ['src/sw-template.js', 'scripts/**', 'public/sw.js', 'next.config.js'],
+        ignores: ['scripts/**', 'public/sw.js', 'next.config.js'],
     },
     ...compat.extends('next/core-web-vitals', 'next/typescript'),
     {
