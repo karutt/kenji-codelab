@@ -19,6 +19,89 @@ const serwist = new Serwist({
     clientsClaim: true,
     navigationPreload: true,
     runtimeCaching: [
+        // 開発ツール・外部サービスの除外（静かに失敗させる）
+        {
+            matcher: ({ request }: { request: Request }) => {
+                const url = request.url;
+                return (
+                    url.includes('vercel.live') ||
+                    url.includes('_next-live') ||
+                    url.includes('hot-reloader') ||
+                    url.includes('webpack-hmr') ||
+                    url.includes('_vercel') ||
+                    url.includes('?_rsc=') // Next.js RSC プリフェッチ
+                );
+            },
+            handler: async () => {
+                // 静かに失敗させる（エラーを投げない）
+                return new Response('', { status: 200 });
+            },
+        },
+
+        // ファビコンとアイコン類
+        {
+            matcher: ({ request }: { request: Request }) => {
+                return (
+                    request.url.endsWith('/favicon.ico') ||
+                    request.url.includes('apple-icon') ||
+                    request.url.includes('android-chrome') ||
+                    /\/(favicon|icon)-/.test(request.url)
+                );
+            },
+            handler: async ({ request }) => {
+                try {
+                    // まずキャッシュから確認
+                    const cache = await caches.open('icons');
+                    const cachedResponse = await cache.match(request);
+                    if (cachedResponse) {
+                        return cachedResponse;
+                    }
+
+                    // ネットワークから取得を試行
+                    const response = await fetch(request);
+                    if (response.ok) {
+                        // 成功した場合はキャッシュして返す
+                        await cache.put(request, response.clone());
+                        return response;
+                    }
+
+                    // 失敗した場合は透明な1x1ピクセルのPNG画像を返す
+                    const fallbackIcon = new Response(
+                        new Uint8Array([
+                            0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+                            0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                            0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4, 0x89, 0x00, 0x00, 0x00,
+                            0x0b, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63, 0x00, 0x01, 0x00, 0x00,
+                            0x05, 0x00, 0x01, 0x0d, 0x0a, 0x2d, 0xb4, 0x00, 0x00, 0x00, 0x00, 0x49,
+                            0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
+                        ]),
+                        {
+                            status: 200,
+                            headers: { 'Content-Type': 'image/png' },
+                        },
+                    );
+                    return fallbackIcon;
+                } catch (error) {
+                    console.warn('Favicon fetch failed, using fallback:', error);
+                    // エラーの場合も同じフォールバックを返す
+                    return new Response(
+                        new Uint8Array([
+                            0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+                            0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                            0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4, 0x89, 0x00, 0x00, 0x00,
+                            0x0b, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63, 0x00, 0x01, 0x00, 0x00,
+                            0x05, 0x00, 0x01, 0x0d, 0x0a, 0x2d, 0xb4, 0x00, 0x00, 0x00, 0x00, 0x49,
+                            0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
+                        ]),
+                        {
+                            status: 200,
+                            headers: { 'Content-Type': 'image/png' },
+                        },
+                    );
+                }
+            },
+        },
+
         // すべての画像（より包括的）
         {
             matcher: ({ request }: { request: Request }) => {
