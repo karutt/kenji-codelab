@@ -155,6 +155,9 @@ export const usePWAPreload = () => {
         setProgress(prev => ({ ...prev, isLoading: true, errors: [] }));
 
         try {
+            // プリロードする重要なページリスト
+            const criticalPages = ['/', '/offline', '/cache', '/books'];
+
             // 利用可能な書籍を取得
             const response = await fetch('/api/articles?getBooks=true');
             if (!response.ok) {
@@ -162,16 +165,25 @@ export const usePWAPreload = () => {
             }
             const books: string[] = await response.json();
 
+            // 書籍ページを追加
+            const bookPages = books.map(bookSlug => `/books/${bookSlug}`);
+
+            // 全ページリストを作成
+            const allPages = [...criticalPages, ...bookPages];
+
             const errors: string[] = [];
             let successCount = 0;
 
-            // 各書籍のメインページをプリロード
-            for (const bookSlug of books) {
+            // 各ページをプリロード
+            for (const pagePath of allPages) {
                 try {
-                    setProgress(prev => ({ ...prev, currentBook: bookSlug }));
+                    setProgress(prev => ({
+                        ...prev,
+                        currentBook: `プリロード中: ${pagePath}`,
+                    }));
 
-                    // 書籍のページを訪問（Service Workerでキャッシュされる）
-                    const pageResponse = await fetch(`/books/${bookSlug}`, {
+                    // ページを訪問（Service Workerでキャッシュされる）
+                    const pageResponse = await fetch(pagePath, {
                         method: 'GET',
                         headers: {
                             Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -180,15 +192,18 @@ export const usePWAPreload = () => {
 
                     if (pageResponse.ok) {
                         successCount++;
-                        console.log(`Successfully preloaded page: /books/${bookSlug}`);
+                        console.log(`Successfully preloaded page: ${pagePath}`);
+
+                        // 少し待機してService Workerが処理を完了できるようにする
+                        await new Promise(resolve => setTimeout(resolve, 100));
                     } else {
                         errors.push(
-                            `Failed to preload page /books/${bookSlug}: ${pageResponse.statusText}`,
+                            `Failed to preload page ${pagePath}: ${pageResponse.statusText}`,
                         );
                     }
                 } catch (error) {
-                    errors.push(`Error preloading page /books/${bookSlug}: ${error}`);
-                    console.error(`Error preloading page /books/${bookSlug}:`, error);
+                    errors.push(`Error preloading page ${pagePath}: ${error}`);
+                    console.error(`Error preloading page ${pagePath}:`, error);
                 }
             }
 
@@ -199,7 +214,7 @@ export const usePWAPreload = () => {
                 errors,
             }));
 
-            console.log(`Pages preloaded: ${successCount}/${books.length}`);
+            console.log(`Pages preloaded: ${successCount}/${allPages.length}`);
         } catch (error) {
             console.error('Error preloading pages:', error);
             setProgress(prev => ({

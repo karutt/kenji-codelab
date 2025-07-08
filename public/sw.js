@@ -1,8 +1,8 @@
-const CACHE_VERSION = 'v10';
-const CACHE_NAME = 'kenji-codelab-v10';
-const STATIC_CACHE_NAME = 'kenji-codelab-static-v10';
-const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v10';
-const IMAGE_CACHE_NAME = 'kenji-codelab-images-v10';
+const CACHE_VERSION = 'v11';
+const CACHE_NAME = 'kenji-codelab-v11';
+const STATIC_CACHE_NAME = 'kenji-codelab-static-v11';
+const ARTICLE_CACHE_NAME = 'kenji-codelab-articles-v11';
+const IMAGE_CACHE_NAME = 'kenji-codelab-images-v11';
 
 // 静的リソース（App Shell）- This will be replaced during build
 const STATIC_ASSETS = [
@@ -532,30 +532,53 @@ const cacheNextJsPage = (request, response) => {
             responseClone
                 .text()
                 .then(text => {
-                    const matches = text.matchAll(/_next\/static\/chunks\/[^"]+/g);
-                    const chunks = [...matches].map(m => m[0]);
+                    console.log(`[Service Worker] Parsing HTML for chunks: ${request.url}`);
+                    
+                    // より包括的なチャンク検出パターン
+                    const chunkPatterns = [
+                        /_next\/static\/chunks\/[^"'\s]+/g,  // 基本のチャンクパターン
+                        /_next\/static\/[^"'\s]+\.js/g,      // その他のNext.js JSファイル
+                        /\/_next\/static\/chunks\/app\/[^"'\s]+\.js/g  // アプリチャンク
+                    ];
+                    
+                    const allChunks = new Set();
+                    
+                    chunkPatterns.forEach(pattern => {
+                        const matches = text.matchAll(pattern);
+                        [...matches].forEach(match => allChunks.add(match[0]));
+                    });
+                    
+                    const chunks = [...allChunks];
+                    
                     if (chunks.length > 0) {
-                        console.log('[Service Worker] Found page chunks to cache:', chunks);
+                        console.log(`[Service Worker] Found ${chunks.length} chunks to cache:`, chunks);
+                        
                         const chunkUrls = chunks.map(
                             chunk => new URL(chunk, self.location.origin).href,
                         );
+                        
                         Promise.all(
                             chunkUrls.map(url =>
                                 fetch(url)
                                     .then(resp => {
                                         if (resp.ok) {
+                                            console.log(`[Service Worker] Successfully cached chunk: ${url}`);
                                             return cache.put(url, resp);
+                                        } else {
+                                            console.warn(`[Service Worker] Failed to fetch chunk (${resp.status}): ${url}`);
                                         }
                                     })
-                                    .catch(err =>
-                                        console.error(
-                                            '[Service Worker] Failed to cache chunk:',
-                                            url,
-                                            err,
-                                        ),
-                                    ),
+                                    .catch(err => {
+                                        console.error(`[Service Worker] Error caching chunk: ${url}`, err);
+                                    }),
                             ),
-                        );
+                        ).then(() => {
+                            console.log(`[Service Worker] Completed caching chunks for: ${request.url}`);
+                        }).catch(err => {
+                            console.error(`[Service Worker] Error in chunk caching process:`, err);
+                        });
+                    } else {
+                        console.log(`[Service Worker] No chunks found in HTML: ${request.url}`);
                     }
                 })
                 .catch(err => {
