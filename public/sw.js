@@ -107,8 +107,33 @@ self.addEventListener('fetch', event => {
 
     // その他: Network First
     event.respondWith(
-        fetch(request).catch(() => {
-            return caches.match(request);
-        }),
+        fetch(request)
+            .then(response => {
+                // レスポンスが成功した場合のみキャッシュ
+                if (response && response.ok) {
+                    const responseClone = response.clone();
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(request, responseClone);
+                    });
+                }
+                return response;
+            })
+            .catch(error => {
+                console.log('Network failed, trying cache:', error);
+                return caches.match(request).then(cachedResponse => {
+                    if (cachedResponse) {
+                        return cachedResponse;
+                    }
+                    // オフラインページを返す
+                    if (request.mode === 'navigate') {
+                        return caches.match('/offline');
+                    }
+                    // その他のリクエストは空のレスポンスを返す
+                    return new Response('', {
+                        status: 204,
+                        statusText: 'No Content (Offline)',
+                    });
+                });
+            }),
     );
 });

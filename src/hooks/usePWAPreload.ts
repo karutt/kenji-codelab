@@ -6,6 +6,7 @@ import { useOfflineState } from '@/hooks/useOfflineState';
 import {
     cacheAllBooks,
     cacheBookArticles,
+    cacheStaticAssets,
     cleanupOldCache,
     getCacheStats,
 } from '@/utils/cache/articleCache';
@@ -144,6 +145,35 @@ export const usePWAPreload = () => {
         }
     };
 
+    // 静的アセットをプリロード
+    const preloadStaticAssets = async () => {
+        if (!isOnline) {
+            console.warn('Cannot preload static assets while offline');
+            return;
+        }
+
+        setProgress(prev => ({ ...prev, isLoading: true, errors: [] }));
+
+        try {
+            const result = await cacheStaticAssets();
+            
+            setProgress(prev => ({
+                ...prev,
+                isLoading: false,
+                errors: result.failed > 0 ? [`Failed to cache ${result.failed} static assets`] : [],
+            }));
+
+            await updateCacheStats();
+        } catch (error) {
+            console.error('Error preloading static assets:', error);
+            setProgress(prev => ({
+                ...prev,
+                isLoading: false,
+                errors: [...prev.errors, `Error preloading static assets: ${error instanceof Error ? error.message : 'Unknown error'}`],
+            }));
+        }
+    };
+
     // 古いキャッシュを削除
     const cleanup = async () => {
         try {
@@ -164,6 +194,7 @@ export const usePWAPreload = () => {
         cacheStats,
         preloadAllBooks,
         preloadBook,
+        preloadStaticAssets,
         cleanup,
         updateCacheStats,
         isOnline,

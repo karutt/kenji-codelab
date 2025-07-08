@@ -48,6 +48,16 @@ export const extractImageUrls = (content: string): string[] => {
         imageUrls.push(match[1]);
     }
 
+    // SVGファイルの参照パターン
+    const svgRegex = /['"]([^'"]*\.svg)['"]|src=["']([^"']*\.svg)["']/g;
+    
+    while ((match = svgRegex.exec(content)) !== null) {
+        const url = match[1] || match[2];
+        if (url) {
+            imageUrls.push(url);
+        }
+    }
+
     // 重複を除去し、相対パスを絶対パスに変換
     return [...new Set(imageUrls)].map(url => {
         if (url.startsWith('http')) {
@@ -282,4 +292,37 @@ export const cleanupOldCache = async (): Promise<void> => {
     } catch (error) {
         console.error('Error cleaning up old cache:', error);
     }
+};
+
+// 静的アセットのプリキャッシュ機能
+export const cacheStaticAssets = async (): Promise<{ success: number; failed: number }> => {
+  const commonAssets = [
+    '/svg/logo.svg',
+    '/svg/logo_text.svg',
+    '/svg/logo_text_v2.svg',
+    '/svg/mail.svg',
+    '/svg/line.svg',
+    '/svg/next.svg',
+    '/svg/book_list_bg.svg',
+    '/svg/book_list_bg2.svg',
+    '/svg/global_chat.svg',
+    '/svg/shark_shape.svg',
+    '/svg/red_shape.svg',
+    '/svg/white_shape.svg',
+    '/svg/x.svg',
+    '/favicon.ico',
+    '/web-app-manifest-192x192.png',
+    '/web-app-manifest-512x512.png',
+    '/icons/icon0.svg',
+    '/icons/icon1.png',
+  ];
+
+  const results = await Promise.allSettled(
+    commonAssets.map(url => cacheImage(url))
+  );
+
+  const success = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
+  const failed = results.length - success;
+
+  return { success, failed };
 };

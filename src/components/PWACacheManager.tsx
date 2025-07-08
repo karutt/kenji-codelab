@@ -8,7 +8,7 @@ import { usePWAPreload } from '@/hooks/usePWAPreload';
 import { clearCache } from '@/utils/cache/articleCache';
 
 export const PWACacheManager = () => {
-    const { progress, cacheStats, preloadAllBooks, cleanup, updateCacheStats, isOnline } =
+    const { progress, cacheStats, preloadAllBooks, preloadStaticAssets, cleanup, updateCacheStats, isOnline } =
         usePWAPreload();
 
     const [isClearing, setIsClearing] = useState(false);
@@ -49,6 +49,23 @@ export const PWACacheManager = () => {
         } catch (error) {
             showToast(
                 `プリロードに失敗しました: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                'error',
+            );
+        }
+    };
+
+    const handlePreloadStatic = async () => {
+        if (!isOnline) {
+            showToast('オフライン状態です。オンライン時に再度お試しください', 'warning');
+            return;
+        }
+
+        try {
+            await preloadStaticAssets();
+            showToast('静的アセットのプリロードが完了しました', 'success');
+        } catch (error) {
+            showToast(
+                `静的アセットのプリロードに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
                 'error',
             );
         }
@@ -234,6 +251,19 @@ export const PWACacheManager = () => {
                             <FiDownload />
                             <Text ml={2}>
                                 {progress.isLoading ? 'プリロード中...' : '全記事をプリロード'}
+                            </Text>
+                        </Button>
+
+                        <Button
+                            w="full"
+                            colorScheme="blue"
+                            disabled={!isOnline}
+                            loading={progress.isLoading}
+                            onClick={handlePreloadStatic}
+                        >
+                            <FiDownload />
+                            <Text ml={2}>
+                                {progress.isLoading ? 'プリロード中...' : '静的アセットをプリロード'}
                             </Text>
                         </Button>
 
