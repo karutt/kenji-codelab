@@ -17,6 +17,9 @@ const compat = new FlatCompat({
 const eslintConfig = [
     ...compat.extends('next/core-web-vitals', 'next/typescript'),
     {
+        ignores: ['public/sw.js'], // Service Workerファイルを除外
+    },
+    {
         files: ['**/*.{js,jsx,ts,tsx}'],
         plugins: {
             import: importPlugin,
@@ -31,6 +34,7 @@ const eslintConfig = [
     },
     {
         files: ['**/*.{js,jsx,ts,tsx}'],
+        ignores: ['public/sw.js'], // TypeScript解析からも除外
         languageOptions: {
             parser: parser,
             parserOptions: {
