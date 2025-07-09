@@ -34,7 +34,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
             // 開発時のパフォーマンス最適化のため、Service Workerの登録を遅延
             const shouldDelayServiceWorker = process.env.NODE_ENV === 'development';
-            
+
             if ('serviceWorker' in navigator) {
                 try {
                     if (shouldDelayServiceWorker) {

@@ -50,7 +50,8 @@ const serwist = new Serwist({
                     url.includes('/_next/webpack-hmr') ||
                     url.includes('/__nextjs_original-stack-frame') ||
                     url.includes('/_next/static/webpack/') ||
-                    (process.env.NODE_ENV === 'development' && url.includes('/_next/static/chunks/'))
+                    (process.env.NODE_ENV === 'development' &&
+                        url.includes('/_next/static/chunks/'))
                 );
             },
             handler: async () => {
@@ -201,7 +202,7 @@ const serwist = new Serwist({
                     if (cachedResponse) {
                         return cachedResponse;
                     }
-                    
+
                     const response = await fetch(request);
                     if (response.ok) {
                         cache.put(request, response.clone());

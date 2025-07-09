@@ -1,9 +1,9 @@
 // Service Worker を無効化するためのダミーエンドポイント
 export async function GET() {
-    return new Response('', { 
+    return new Response('', {
         status: 404,
         headers: {
-            'Content-Type': 'text/plain'
-        }
+            'Content-Type': 'text/plain',
+        },
     });
 }
