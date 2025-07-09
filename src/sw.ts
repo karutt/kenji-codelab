@@ -13,6 +13,23 @@ declare global {
 
 declare const self: WorkerGlobalScope;
 
+// より効率的なキャッシュファースト戦略のカスタマイザー
+const createOptimizedCacheFirst = (cacheName: string) => ({
+    cacheName,
+    cacheKeyWillBeUsed: async ({ request }: { request: Request }) => {
+        // クエリパラメータを正規化してキャッシュキーを最適化
+        const url = new URL(request.url);
+        // 開発時のホットリロード関連パラメータを除去
+        url.searchParams.delete('_rsc');
+        url.searchParams.delete('_next-live');
+        return url.href;
+    },
+    cacheWillUpdate: async ({ response }: { response: Response }) => {
+        // 成功レスポンスのみキャッシュ
+        return response.status === 200;
+    },
+});
+
 const serwist = new Serwist({
     precacheEntries: self.__SW_MANIFEST,
     skipWaiting: true,
@@ -81,8 +98,8 @@ const serwist = new Serwist({
                         },
                     );
                     return fallbackIcon;
-                } catch (error) {
-                    console.warn('Favicon fetch failed, using fallback:', error);
+                } catch {
+                    // ファビコンのエラーは静かに処理（ログなし）
                     // エラーの場合も同じフォールバックを返す
                     return new Response(
                         new Uint8Array([
@@ -111,7 +128,7 @@ const serwist = new Serwist({
                 );
             },
             handler: new CacheFirst({
-                cacheName: 'images',
+                ...createOptimizedCacheFirst('images'),
             }),
         },
 
@@ -121,7 +138,7 @@ const serwist = new Serwist({
                 return /\/books\/.*\/images\/.*\.(png|jpg|jpeg|svg|gif|webp)$/i.test(request.url);
             },
             handler: new CacheFirst({
-                cacheName: 'article-images',
+                ...createOptimizedCacheFirst('article-images'),
             }),
         },
 
@@ -156,7 +173,7 @@ const serwist = new Serwist({
                 );
             },
             handler: new CacheFirst({
-                cacheName: 'fonts',
+                ...createOptimizedCacheFirst('fonts'),
             }),
         },
 
@@ -170,7 +187,7 @@ const serwist = new Serwist({
                 );
             },
             handler: new CacheFirst({
-                cacheName: 'static-assets',
+                ...createOptimizedCacheFirst('static-assets'),
             }),
         },
 
@@ -201,7 +218,10 @@ self.addEventListener('message', async (event: Event) => {
             const pagesCache = await self.caches.open('pages');
             const staticAssetsCache = await self.caches.open('static-assets');
 
-            console.log(`Service Worker: Caching ${urlsToCache.length} URLs`);
+            // 開発時のみ詳細ログ
+            if (process.env.NODE_ENV === 'development') {
+                console.log(`Service Worker: Caching ${urlsToCache.length} URLs`);
+            }
 
             if (urlsToCache.length === 0) {
                 console.warn('Service Worker: No URLs to cache');
@@ -238,10 +258,10 @@ self.addEventListener('message', async (event: Event) => {
                             } else {
                                 await pagesCache.add(fullUrl);
                             }
-                            console.log(`Cached: ${fullUrl}`);
+                            // 個別URLのログは削除（バッチ完了時のみログ出力）
                             return { url, success: true };
                         } catch (error) {
-                            console.warn(`Failed to cache ${url}:`, error);
+                            // エラーの詳細ログも削除（最終集計時のみ表示）
                             return { url, success: false, error };
                         }
                     }),
@@ -262,12 +282,15 @@ self.addEventListener('message', async (event: Event) => {
                 });
             }
 
-            console.log(
-                `Service Worker: Cache installation complete - Success: ${successCount}, Errors: ${errorCount}`,
-            );
+            // 開発時のみログ出力
+            if (process.env.NODE_ENV === 'development') {
+                console.log(
+                    `Service Worker: Cache installation complete - Success: ${successCount}, Errors: ${errorCount}`,
+                );
 
-            if (failedUrls.length > 0) {
-                console.warn('Failed URLs:', failedUrls);
+                if (failedUrls.length > 0) {
+                    console.warn('Failed URLs:', failedUrls);
+                }
             }
 
             // 完了をクライアントに通知

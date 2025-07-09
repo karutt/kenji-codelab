@@ -22,60 +22,80 @@ export interface OfflineState {
     connectionType: string | null;
 }
 
-export const useOfflineState = () => {
-    const [state, setState] = useState<OfflineState>({
-        isOnline: typeof window !== 'undefined' ? window.navigator.onLine : true,
-        isOffline: typeof window !== 'undefined' ? !window.navigator.onLine : false,
-        lastOnlineAt: null,
-        connectionType: null,
-    });
+// グローバル状態管理でイベントリスナーの重複を防ぐ
+let globalState: OfflineState = {
+    isOnline: typeof window !== 'undefined' ? window.navigator.onLine : true,
+    isOffline: typeof window !== 'undefined' ? !window.navigator.onLine : false,
+    lastOnlineAt: null,
+    connectionType: null,
+};
 
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
+let isInitialized = false;
+const listeners = new Set<(state: OfflineState) => void>();
 
-        const updateOnlineStatus = () => {
-            const isOnline = window.navigator.onLine;
-            const now = Date.now();
+const initializeOfflineDetection = () => {
+    if (isInitialized || typeof window === 'undefined') return;
 
-            setState(prev => ({
-                ...prev,
-                isOnline,
-                isOffline: !isOnline,
-                lastOnlineAt: isOnline ? now : prev.lastOnlineAt,
-            }));
+    const updateOnlineStatus = () => {
+        const isOnline = window.navigator.onLine;
+        const now = Date.now();
+
+        globalState = {
+            ...globalState,
+            isOnline,
+            isOffline: !isOnline,
+            lastOnlineAt: isOnline ? now : globalState.lastOnlineAt,
         };
 
-        const updateConnectionType = () => {
-            const nav = navigator as NavigatorWithConnection;
-            const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
+        // 全てのリスナーに変更を通知
+        listeners.forEach(listener => listener(globalState));
+    };
 
-            setState(prev => ({
-                ...prev,
-                connectionType: connection ? connection.effectiveType : null,
-            }));
-        };
-
-        // 初期状態を設定
-        updateOnlineStatus();
-        updateConnectionType();
-
-        // イベントリスナーを追加
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-
+    const updateConnectionType = () => {
         const nav = navigator as NavigatorWithConnection;
         const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
-        if (connection) {
-            connection.addEventListener('change', updateConnectionType);
-        }
+
+        globalState = {
+            ...globalState,
+            connectionType: connection ? connection.effectiveType : null,
+        };
+
+        listeners.forEach(listener => listener(globalState));
+    };
+
+    // 初期状態を設定
+    updateOnlineStatus();
+    updateConnectionType();
+
+    // イベントリスナーを追加（グローバルに一度だけ）
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    const nav = navigator as NavigatorWithConnection;
+    const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
+    if (connection) {
+        connection.addEventListener('change', updateConnectionType);
+    }
+
+    isInitialized = true;
+};
+
+export const useOfflineState = () => {
+    const [state, setState] = useState<OfflineState>(globalState);
+
+    useEffect(() => {
+        // グローバル初期化
+        initializeOfflineDetection();
+
+        // リスナーを追加
+        listeners.add(setState);
+
+        // 現在の状態を設定
+        setState(globalState);
 
         return () => {
-            window.removeEventListener('online', updateOnlineStatus);
-            window.removeEventListener('offline', updateOnlineStatus);
-
-            if (connection) {
-                connection.removeEventListener('change', updateConnectionType);
-            }
+            // リスナーを削除
+            listeners.delete(setState);
         };
     }, []);
 
