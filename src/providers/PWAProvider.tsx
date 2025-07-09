@@ -25,27 +25,20 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         previousOnlineState.current = isOnline;
     }, [isOnline]);
 
-    // PWA機能の初期化（一度だけ実行）
+    // PWA機能の初期化（最小限、オフライン時のみ必要）
     useEffect(() => {
         if (isPWAInitialized) return;
 
         const initializePWA = async () => {
             isPWAInitialized = true;
 
-            // 開発時のパフォーマンス最適化のため、Service Workerの登録を遅延
-            const shouldDelayServiceWorker = process.env.NODE_ENV === 'development';
-
+            // オンライン時はPWA機能を最小限に
             if ('serviceWorker' in navigator) {
                 try {
-                    if (shouldDelayServiceWorker) {
-                        // 開発時は1秒遅延してService Workerの影響を最小化
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                    }
-
-                    // Service Worker の状態確認（ログなし）
+                    // Service Workerは自動登録されるので確認のみ
                     await navigator.serviceWorker.getRegistration();
 
-                    // IndexedDBを初期化（一度だけ、ログ削除）
+                    // IndexedDBを初期化（一度だけ）
                     if (!isDBInitialized) {
                         const db = getDB();
                         await db.init();
@@ -54,7 +47,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
                     // 開発時のみログ出力
                     if (process.env.NODE_ENV === 'development') {
-                        console.log('PWA features initialized');
+                        console.log('PWA features initialized (offline-only mode)');
                     }
                 } catch (error) {
                     console.error('Failed to initialize PWA features:', error);
@@ -64,6 +57,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
             }
         };
 
+        // PWA初期化の遅延を削除（オフライン専用なので影響最小限）
         initializePWA();
     }, []); // 空の依存配列で一度だけ実行
 
