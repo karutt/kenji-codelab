@@ -32,8 +32,16 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         const initializePWA = async () => {
             isPWAInitialized = true;
 
+            // 開発時のパフォーマンス最適化のため、Service Workerの登録を遅延
+            const shouldDelayServiceWorker = process.env.NODE_ENV === 'development';
+            
             if ('serviceWorker' in navigator) {
                 try {
+                    if (shouldDelayServiceWorker) {
+                        // 開発時は1秒遅延してService Workerの影響を最小化
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+
                     // Service Worker の状態確認（ログなし）
                     await navigator.serviceWorker.getRegistration();
 

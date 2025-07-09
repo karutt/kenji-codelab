@@ -36,7 +36,7 @@ const serwist = new Serwist({
     clientsClaim: true,
     navigationPreload: true,
     runtimeCaching: [
-        // 開発ツール・外部サービスの除外（静かに失敗させる）
+        // 開発ツール・外部サービス・Next.jsの内部リクエストの除外
         {
             matcher: ({ request }: { request: Request }) => {
                 const url = request.url;
@@ -46,7 +46,11 @@ const serwist = new Serwist({
                     url.includes('hot-reloader') ||
                     url.includes('webpack-hmr') ||
                     url.includes('_vercel') ||
-                    url.includes('?_rsc=') // Next.js RSC プリフェッチ
+                    url.includes('?_rsc=') || // Next.js RSC プリフェッチ
+                    url.includes('/_next/webpack-hmr') ||
+                    url.includes('/__nextjs_original-stack-frame') ||
+                    url.includes('/_next/static/webpack/') ||
+                    (process.env.NODE_ENV === 'development' && url.includes('/_next/static/chunks/'))
                 );
             },
             handler: async () => {
@@ -177,7 +181,7 @@ const serwist = new Serwist({
             }),
         },
 
-        // 静的アセット（JS, CSS）
+        // 静的アセット（JS, CSS）- 開発時は最小限
         {
             matcher: ({ request }: { request: Request }) => {
                 return (
@@ -186,18 +190,52 @@ const serwist = new Serwist({
                     /\/_next\/static\//.test(request.url)
                 );
             },
-            handler: new CacheFirst({
-                ...createOptimizedCacheFirst('static-assets'),
-            }),
+            handler: async ({ request }) => {
+                // 開発時はキャッシュを無効化してHMRを優先
+                if (process.env.NODE_ENV === 'development') {
+                    return fetch(request);
+                } else {
+                    // 本番時のみCacheFirstを適用
+                    const cache = await caches.open('static-assets');
+                    const cachedResponse = await cache.match(request);
+                    if (cachedResponse) {
+                        return cachedResponse;
+                    }
+                    
+                    const response = await fetch(request);
+                    if (response.ok) {
+                        cache.put(request, response.clone());
+                    }
+                    return response;
+                }
+            },
         },
 
-        // HTML ページ（ナビゲーション）
+        // HTML ページ（ナビゲーション）- 開発時はバイパス
         {
             matcher: ({ request }: { request: Request }) => request.mode === 'navigate',
-            handler: new NetworkFirst({
-                cacheName: 'pages',
-                networkTimeoutSeconds: 3,
-            }),
+            handler: async ({ request }) => {
+                // 開発時はService Workerをバイパスしてパフォーマンスを優先
+                if (process.env.NODE_ENV === 'development') {
+                    // 開発時は直接ネットワークから取得（キャッシュなし）
+                    return fetch(request);
+                } else {
+                    // 本番時のみキャッシュ戦略を適用
+                    try {
+                        const response = await fetch(request);
+                        const cache = await caches.open('pages');
+                        cache.put(request, response.clone());
+                        return response;
+                    } catch (error) {
+                        const cache = await caches.open('pages');
+                        const cachedResponse = await cache.match(request);
+                        if (cachedResponse) {
+                            return cachedResponse;
+                        }
+                        throw error;
+                    }
+                }
+            },
         },
     ],
 });
